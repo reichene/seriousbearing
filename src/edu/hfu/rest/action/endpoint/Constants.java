@@ -1,4 +1,4 @@
-package edu.hfu.rest.endpoint.action;
+package edu.hfu.rest.action.endpoint;
 
 /**
  * Contains the client IDs and scopes for allowed clients consuming the helloworld API.

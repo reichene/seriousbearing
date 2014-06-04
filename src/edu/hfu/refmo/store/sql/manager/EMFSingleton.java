@@ -1,4 +1,4 @@
-package edu.hfu.refmo.policystoremanager;
+package edu.hfu.refmo.store.sql.manager;
 
 import java.util.HashMap;
 import java.util.Map;

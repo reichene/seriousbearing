@@ -13,18 +13,37 @@
         </properties>
     </persistence-unit>
     
-       <persistence-unit name="JPAReferenceMonitor">
-      <class>edu.hfu.refmo.policystore.Function</class>
-      <class>edu.hfu.refmo.policystore.Match</class>
-      <class>edu.hfu.refmo.policystore.MatchGroup</class>
-      <class>edu.hfu.refmo.policystore.MatchSingle</class>
-      <class>edu.hfu.refmo.policystore.Rule</class>
-      <class>edu.hfu.refmo.policystore.Target</class>
+   <persistence-unit name="JPAReferenceMonitor_Tree">
+      <class>edu.hfu.refmo.store.sql.model.Function</class>
+      <class>edu.hfu.refmo.store.sql.model.Match</class>
+      <class>edu.hfu.refmo.store.sql.model.MatchGroup</class>
+      <class>edu.hfu.refmo.store.sql.model.MatchSingle</class>
+      <class>edu.hfu.refmo.store.sql.model.Rule</class>
+      <class>edu.hfu.refmo.store.sql.model.Target</class>
       
     <exclude-unlisted-classes/>
 
     <properties>
        <!--     <property name="datanucleus.autoCreateSchema" value="true"/> -->
+    </properties>
+
+  </persistence-unit>
+  
+   
+   <persistence-unit name="JPAReferenceMonitor">
+      <class>edu.hfu.refmo.store.sql.model.basic.DBRule</class>
+      <class>edu.hfu.refmo.store.sql.model.basic.DBAction</class>
+      <class>edu.hfu.refmo.store.sql.model.basic.DBCategory</class>     
+      <class>edu.hfu.refmo.store.sql.model.basic.DBResource</class>     
+      <class>edu.hfu.refmo.store.sql.model.basic.DBSubject</class>            
+      <class>edu.hfu.refmo.store.sql.model.basic.DBMatch</class> 
+    <exclude-unlisted-classes/>
+
+    <properties>
+              <property name="datanucleus.autoCreateSchema" value="true"/>
+            <property name="datanucleus.validateTables" value="true"/>
+            <property name="datanucleus.validateConstraints" value="true"/>
+
     </properties>
 
   </persistence-unit>

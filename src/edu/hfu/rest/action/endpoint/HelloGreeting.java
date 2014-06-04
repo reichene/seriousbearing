@@ -1,4 +1,4 @@
-package edu.hfu.rest.endpoint.action;
+package edu.hfu.rest.action.endpoint;
 
 public class HelloGreeting {
 

@@ -24,23 +24,22 @@
     "maxAge" : 0
   },
   "methods" : {
-    "helloworld.greetings.multiply" : {
-      "path" : "hellogreeting/{times}",
-      "httpMethod" : "post",
+    "helloworld.greetings.getGreeting" : {
+      "path" : "hellogreeting/{id}",
+      "httpMethod" : "GET",
       "authLevel" : "NONE",
       "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
       "audiences" : [ "replace this with your web client application ID" ],
       "clientIds" : [ "replace this with your web client application ID", "replace this with your Android client ID", "replace this with your iOS client ID" ],
-      "rosyMethod" : "edu.hfu.rest.endpoint.action.Greetings.insertGreeting",
+      "rosyMethod" : "edu.hfu.rest.action.endpoint.Greetings.getGreeting",
       "request" : {
         "parameters" : {
-          "times" : {
+          "id" : {
             "type" : "int32",
             "required" : true
           }
         },
-        "body" : "autoTemplate(backendRequest)",
-        "bodyName" : "resource"
+        "body" : "empty"
       },
       "response" : {
         "body" : "autoTemplate(backendResponse)"
@@ -53,7 +52,7 @@
       "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
       "audiences" : [ "replace this with your web client application ID" ],
       "clientIds" : [ "replace this with your web client application ID", "replace this with your Android client ID", "replace this with your iOS client ID" ],
-      "rosyMethod" : "edu.hfu.rest.endpoint.action.Greetings.listGreeting",
+      "rosyMethod" : "edu.hfu.rest.action.endpoint.Greetings.listGreeting",
       "request" : {
         "body" : "empty"
       },
@@ -68,7 +67,7 @@
       "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
       "audiences" : [ "replace this with your web client application ID" ],
       "clientIds" : [ "replace this with your web client application ID", "replace this with your Android client ID", "replace this with your iOS client ID" ],
-      "rosyMethod" : "edu.hfu.rest.endpoint.action.Greetings.authedGreeting",
+      "rosyMethod" : "edu.hfu.rest.action.endpoint.Greetings.authedGreeting",
       "request" : {
         "body" : "empty"
       },
@@ -76,22 +75,23 @@
         "body" : "autoTemplate(backendResponse)"
       }
     },
-    "helloworld.greetings.getGreeting" : {
-      "path" : "hellogreeting/{id}",
-      "httpMethod" : "GET",
+    "helloworld.greetings.multiply" : {
+      "path" : "hellogreeting/{times}",
+      "httpMethod" : "post",
       "authLevel" : "NONE",
       "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
       "audiences" : [ "replace this with your web client application ID" ],
       "clientIds" : [ "replace this with your web client application ID", "replace this with your Android client ID", "replace this with your iOS client ID" ],
-      "rosyMethod" : "edu.hfu.rest.endpoint.action.Greetings.getGreeting",
+      "rosyMethod" : "edu.hfu.rest.action.endpoint.Greetings.insertGreeting",
       "request" : {
         "parameters" : {
-          "id" : {
+          "times" : {
             "type" : "int32",
             "required" : true
           }
         },
-        "body" : "empty"
+        "body" : "autoTemplate(backendRequest)",
+        "bodyName" : "resource"
       },
       "response" : {
         "body" : "autoTemplate(backendResponse)"
@@ -123,25 +123,25 @@
       }
     },
     "methods" : {
-      "edu.hfu.rest.endpoint.action.Greetings.insertGreeting" : {
-        "request" : {
-          "$ref" : "HelloGreeting"
-        },
+      "edu.hfu.rest.action.endpoint.Greetings.getGreeting" : {
         "response" : {
           "$ref" : "HelloGreeting"
         }
       },
-      "edu.hfu.rest.endpoint.action.Greetings.listGreeting" : {
+      "edu.hfu.rest.action.endpoint.Greetings.listGreeting" : {
         "response" : {
           "$ref" : "HelloGreetingCollection"
         }
       },
-      "edu.hfu.rest.endpoint.action.Greetings.authedGreeting" : {
+      "edu.hfu.rest.action.endpoint.Greetings.authedGreeting" : {
         "response" : {
           "$ref" : "HelloGreeting"
         }
       },
-      "edu.hfu.rest.endpoint.action.Greetings.getGreeting" : {
+      "edu.hfu.rest.action.endpoint.Greetings.insertGreeting" : {
+        "request" : {
+          "$ref" : "HelloGreeting"
+        },
         "response" : {
           "$ref" : "HelloGreeting"
         }

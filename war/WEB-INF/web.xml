@@ -19,7 +19,7 @@
     <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
     <init-param>
       <param-name>com.sun.jersey.config.property.packages</param-name>
-      <param-value>edu.hfu.rest.jersey.action</param-value>
+      <param-value>edu.hfu.rest.action.jersey</param-value>
     </init-param>
 
     <init-param>
@@ -38,7 +38,7 @@
   <servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
   <init-param>
    <param-name>services</param-name>
-   <param-value>edu.hfu.rest.endpoint.action.Greetings</param-value>
+   <param-value>edu.hfu.rest.action.endpoint.Greetings</param-value>
   </init-param>
  </servlet>
  <servlet-mapping>
@@ -58,7 +58,7 @@
   <servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
   <init-param>
    <param-name>services</param-name>
-   <param-value>edu.hfu.rest.endpoint.action.Greetings</param-value>
+   <param-value>edu.hfu.rest.action.endpoint.Greetings</param-value>
   </init-param>
  </servlet>
  <servlet-mapping>

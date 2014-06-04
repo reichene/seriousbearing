@@ -1,4 +1,4 @@
-package edu.hfu.refmo.policystore;
+package edu.hfu.refmo.store.sql.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;

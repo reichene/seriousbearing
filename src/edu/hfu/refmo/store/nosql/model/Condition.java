@@ -1,4 +1,4 @@
-package edu.hfu.refmo.policystore.objectify;
+package edu.hfu.refmo.store.nosql.model;
 
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
@@ -11,7 +11,8 @@ public class Condition {
 		  p_color = p_color;
 		  
 	}
-	@Id public Long id;
-	    @Index public String license;
+	  @Id public Long id;
+	   @Index public String license;
 	   public int color;
+	  public Kind kind;
 }

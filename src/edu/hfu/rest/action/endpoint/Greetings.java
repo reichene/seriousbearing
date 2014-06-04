@@ -1,4 +1,4 @@
-package edu.hfu.rest.endpoint.action;
+package edu.hfu.rest.action.endpoint;
 
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;

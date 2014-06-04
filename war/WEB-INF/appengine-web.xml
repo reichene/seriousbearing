@@ -19,7 +19,7 @@
     <property name="cloudsql.password" value=""/>
     
      <property name="cloudsql.url.dev" value="jdbc:mysql://localhost/"/>
-    <property name="cloudsql.database.dev" value="policystore_nested1_singleclasstable"/>
+    <property name="cloudsql.database.dev" value="rulestore_basic"/>
     <property name="cloudsql.user.dev" value="root"/>
     <property name="cloudsql.password.dev" value="admin"/>
   </system-properties>
