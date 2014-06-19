@@ -47,4 +47,25 @@
     </properties>
 
   </persistence-unit>
+  
+   <persistence-unit name="JPAReferenceMonitorAdva">
+      <class>edu.hfu.refmo.store.sql.model.advanced.DBRule</class>
+      <class>edu.hfu.refmo.store.sql.model.advanced.DBAction</class>
+      <class>edu.hfu.refmo.store.sql.model.advanced.DBRulePriority</class>
+      <class>edu.hfu.refmo.store.sql.model.advanced.DBCategory</class>     
+      <class>edu.hfu.refmo.store.sql.model.advanced.DBResource</class>     
+      <class>edu.hfu.refmo.store.sql.model.advanced.DBSubject</class>            
+      <class>edu.hfu.refmo.store.sql.model.advanced.DBTerm</class> 
+      <class>edu.hfu.refmo.store.sql.model.advanced.DBTerm_Condition</class> 
+      <class>edu.hfu.refmo.store.sql.model.advanced.DBTerm_Conjunction</class> 
+    <exclude-unlisted-classes/>
+
+    <properties>
+              <property name="datanucleus.autoCreateSchema" value="true"/>
+            <property name="datanucleus.validateTables" value="true"/>
+            <property name="datanucleus.validateConstraints" value="true"/>
+
+    </properties>
+
+  </persistence-unit>
 </persistence>

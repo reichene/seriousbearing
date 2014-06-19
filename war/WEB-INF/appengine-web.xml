@@ -13,13 +13,13 @@
   <!-- Configure java.util.logging -->
   <system-properties>
     <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
-         <property name="cloudsql.url" value="jdbc:google:mysql://your-instance-name/"/>
-    <property name="cloudsql.database" value="Greeting"/>
-    <property name="cloudsql.user" value=""/>
-    <property name="cloudsql.password" value=""/>
+         <property name="cloudsql.url" value="jdbc:google:mysql://serious-bearing-580:airport420/"/>
+    <property name="cloudsql.database" value="rulestore"/>
+    <property name="cloudsql.user" value="root"/>
+    <property name="cloudsql.password" value="ApfelSchorle1"/>
     
      <property name="cloudsql.url.dev" value="jdbc:mysql://localhost/"/>
-    <property name="cloudsql.database.dev" value="rulestore_basic"/>
+    <property name="cloudsql.database.dev" value="rulestore_advanced"/>
     <property name="cloudsql.user.dev" value="root"/>
     <property name="cloudsql.password.dev" value="admin"/>
   </system-properties>

@@ -1,18 +1,11 @@
-package edu.hfu.rest.action.jersey;
+ package edu.hfu.rest.action.jersey;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.util.Date;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
-import java.sql.Statement;
 
-import javax.persistence.EntityManager;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
@@ -20,14 +13,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-
-import de.abacs.base.entity.Attribute;
-import de.abacs.base.entity.Decision;
+import de.abacs.base.entity.Rule;
 import edu.hfu.refmo.processor.ProcessorManager;
 import edu.hfu.refmo.query.QueryManagerImpl;
+import edu.hfu.refmo.testing.TestDataGenerator;
 import edu.hfu.rest.action.model.RefmoRequest;
 import edu.hfu.rest.action.model.RefmoResponse;
 import edu.hfu.rest.action.model.RequestAttribute;
@@ -35,6 +24,13 @@ import edu.hfu.rest.action.model.RequestAttribute;
 @Path("/request")
 public class RequestManager {
 
+	/**
+	 *  keep in mind: processor currently supports only equal conditions 
+	 *  rule_priority attributes arent observed
+	 *
+	 */
+	
+	
 	private static final Logger log = Logger.getLogger(RequestManager.class
 			.getName());
 
@@ -43,18 +39,29 @@ public class RequestManager {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public RefmoResponse requestAccess(RefmoRequest req) {
+		
+		//log.info(req.toString());
 
-		RefmoResponse rr = null;
+		RefmoResponse rr = new RefmoResponse();
 
 		try {
+			
+			Rule new_rule = req.getRule();
 			rr = ProcessorManager.process(new QueryManagerImpl().read(
-					req.getRuleAttributes(), req.getSubjectAttributes(),
-					req.getActionAttributes(), req.getResourceAttributes()));
+					 new_rule.getRootElement(),
+					(new_rule.getSubject() != null ? new_rule.getSubject().getRootElement():null),
+					(new_rule.getAction() != null ? new_rule.getAction().getRootElement():null),
+					(new_rule.getResource() != null ? new_rule.getResource().getRootElement():null)
+				
+					
+					));
 		}
 
 		catch (Exception e) {
 
+		
 			rr = new RefmoResponse(e.getStackTrace());
+			e.printStackTrace();
 
 		}
 		return rr;
@@ -68,19 +75,23 @@ public class RequestManager {
 	public RefmoResponse requestAccess(@Context UriInfo info) {
 
 		
-		RefmoResponse rr = null;
+		RefmoResponse rr = new RefmoResponse();
 
 		try {
 			RefmoRequest refre = RequestManager.parseURI(info);
+			Rule new_rule = refre.getRule();
 			rr = ProcessorManager.process(new QueryManagerImpl().read(
-					refre.getRuleAttributes(), refre.getSubjectAttributes(),
-					refre.getActionAttributes(), refre.getResourceAttributes()));
+					new_rule.getRootElement(),
+					(new_rule.getSubject() != null ? new_rule.getSubject().getRootElement():null),
+					(new_rule.getAction() != null ? new_rule.getAction().getRootElement():null),
+					(new_rule.getResource() != null ? new_rule.getResource().getRootElement():null)
+					));
 		}
 
 		catch (Exception e) {
 
 			rr = new RefmoResponse(e.getStackTrace());
-
+			e.printStackTrace();
 		}
 		return rr;
 
@@ -90,6 +101,17 @@ public class RequestManager {
 		// req.returnCombinedDecision = false;
 
 	}
+	
+	@Path("/test")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public RefmoRequest getTestRefmoRequest() {
+		
+		new TestDataGenerator().getRandomRefmoRequest();
+		
+		return null;
+	}
+	
 	private static RefmoRequest parseURI(UriInfo info) {
 		RefmoRequest refre = new RefmoRequest();
 
@@ -103,40 +125,31 @@ public class RequestManager {
 					info.getQueryParameters().getFirst(s_key));
 			
 			if (s_key.startsWith("__")){
-				log.info("attribute_suffix "+ s_key.substring(0,4)  +  "attribute: "+ s_key.substring(4));
+				log.info("attribute_suffix "+ s_key.substring(0,4)  +  " attribute: "+ s_key.substring(4));
 			}
 		
 			if (s_key.startsWith("__s_")) {
-
-				refre.subject_attributes.add(ra_new);
-
+				if(refre.getSubject_attributes() != null){
+				refre.getSubject_attributes().add(ra_new);
+			}
 			} else if (s_key.startsWith("__o_")) {
-
-				refre.resource_attributes.add(ra_new);
+				if(refre.getResource_attributes() != null){
+				refre.getResource_attributes().add(ra_new);
+			}
 			} else if (s_key.startsWith("__a_")) {
-
-				refre.action_attributes.add(ra_new);
+				if(refre.getAction_attributes() != null){
+				refre.getAction_attributes().add(ra_new);
+			}
 			} else if (s_key.startsWith("__r_")) {
-
-				refre.rule_attributes.add(ra_new);
+				
+				if(refre.getRule_attributes() != null){
+				refre.getRule_attributes().add(ra_new);
+				}
 			} else {
 				
 				log.info("attribute: "+ s_key);
 
-				switch (s_key.substring(4)) {
-				case "descision":
-					
-					refre.descision_string = s_key.substring(4);
-					break;
-					
-				case "rule_description":
-					refre.ruleDescription = s_key.substring(4);
-					break;
-				default:
-					
-					break;
-				}
-
+			
 			}
 
 		}

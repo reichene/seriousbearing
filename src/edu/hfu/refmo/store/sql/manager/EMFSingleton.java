@@ -21,7 +21,7 @@ public class EMFSingleton {
 	        	
 	     
 	       
-	        	 Map<String, String> properties = new HashMap();
+	        	 Map<String, String> properties = new HashMap<String, String>();
 	        	    if (SystemProperty.environment.value() ==
 	        	          SystemProperty.Environment.Value.Production) {
 	        	properties.put("javax.persistence.jdbc.driver", "com.mysql.jdbc.GoogleDriver");
@@ -36,7 +36,7 @@ public class EMFSingleton {
 	        	    }
 
 	        	EntityManagerFactory emf = Persistence.createEntityManagerFactory(
-	        	        "JPAReferenceMonitor", properties);
+	        	        "JPAReferenceMonitorAdva", properties);
 
 	        	    // Insert a few rows.
 	        	    instance = emf;

@@ -1,6 +1,5 @@
 package edu.hfu.refmo.processor;
 
-import de.abacs.base.entity.Decision;
 import de.abacs.base.process.Processor;
 import de.abacs.base.query.Query;
 import de.abacs.base.strategy.DenyOverridesStrategy;
@@ -13,9 +12,11 @@ public class ProcessorManager {
 		
 		
 		Processor processor = new Processor(RuleStoreManagerFactory.getRuleStoreManagerClass(), new DenyOverridesStrategy());
-        Decision finalDecision = processor.process(new_query.toString());
-	
-        return new RefmoResponse(finalDecision);
+       
+		//for test usage only
+		//processor.printRuleSet();
+		
+        return new RefmoResponse(processor.process(new_query.toString()));
 		
 		
 		
