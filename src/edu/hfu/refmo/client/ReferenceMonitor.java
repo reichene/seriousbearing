@@ -262,12 +262,7 @@ public class ReferenceMonitor {
 			cats[0] = new RulePriority(new Condition(Comparision.EQUAL, "rulep", "asd"));
 			cats[1] = new Action(new Condition(Comparision.EQUAL, "action", "asd"));
 			cats[2] = new Subject(new Condition(Comparision.EQUAL, "subject", "asd"));
-			cats[3] = new Resource(new Conjunction(Function.AND,
-					new Condition(Comparision.EQUAL, "asd", "asd"),
-					new Condition(Comparision.EQUAL, "asd", "asd"),
-					new Condition(Comparision.EQUAL, "asd", "asd"),
-					new Conjunction(Function.AND)
-					  ));
+			cats[3] = new Resource(new Condition(Comparision.EQUAL, "resource", "asd"));
 			
 			cats_up[0] = new RulePriority(new Condition(Comparision.EQUAL, "asd", "asd"));
 			cats_up[1] = new Action(new Condition(Comparision.EQUAL, "asd", "asd"));

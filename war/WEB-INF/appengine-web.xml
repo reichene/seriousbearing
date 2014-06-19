@@ -4,7 +4,7 @@
   <application>serious-bearing-580</application>
   <sessions-enabled>true</sessions-enabled>
   <threadsafe>true</threadsafe>
-  <version>1</version>
+  <version>4</version>
 
   <!--
     Allows App Engine to send multiple requests to one instance in parallel:
