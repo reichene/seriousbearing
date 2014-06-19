@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?><web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.5" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
+    
+    
+    <!-- Sample GAE Client Servlet -->
+	<servlet>
+		<servlet-name>RefmoClient</servlet-name>
+		<servlet-class>edu.hfu.refmo.demo.RefmoClientServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>RefmoClient</servlet-name>
+		<url-pattern>/refmo_client</url-pattern>
+	</servlet-mapping>
+	
 
 <!-- Sample GAE Servlet -->
 	<servlet>

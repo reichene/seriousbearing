@@ -40,12 +40,7 @@ public class RefmoClientServlet extends HttpServlet {
 			cats[0] = new RulePriority(new Condition(Comparision.EQUAL, "rulep", "asd"));
 			cats[1] = new Action(new Condition(Comparision.EQUAL, "action", "asd"));
 			cats[2] = new Subject(new Condition(Comparision.EQUAL, "subject", "asd"));
-			cats[3] = new Resource(new Conjunction(Function.AND,
-					new Condition(Comparision.EQUAL, "asd", "asd"),
-					new Condition(Comparision.EQUAL, "asd", "asd"),
-					new Condition(Comparision.EQUAL, "asd", "asd"),
-					new Conjunction(Function.AND)
-					  ));
+			cats[3] = new Resource(new Condition(Comparision.EQUAL, "resource", "asd"));
 			
 			cats_up[0] = new RulePriority(new Condition(Comparision.EQUAL, "asd", "asd"));
 			cats_up[1] = new Action(new Condition(Comparision.EQUAL, "asd", "asd"));
@@ -54,7 +49,7 @@ public class RefmoClientServlet extends HttpServlet {
 			
 					
 		
-			ReferenceMonitor rm = new ReferenceMonitor("http://1.serious-bearing-580.appspot.com/");
+			ReferenceMonitor rm = new ReferenceMonitor("http://4.serious-bearing-580.appspot.com/");
 			rm.createRule("martin reichendecker", cats);
 			rm.updateRule(cats, cats_up);
 			rm.deleteRule(cats);

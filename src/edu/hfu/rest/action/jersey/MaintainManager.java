@@ -62,7 +62,7 @@ public class MaintainManager {
 
 		catch (Exception e) {
 
-			rr = new RefmoResponse(e.getStackTrace());
+			rr = new RefmoResponse(e.getStackTrace(), e.getMessage(), e.getLocalizedMessage(), e.toString(), e.getCause().toString());
 			log.warning(e.getMessage());
 		//	e.printStackTrace();
 
@@ -115,7 +115,7 @@ public class MaintainManager {
 
 			catch (Exception e) {
 
-				rr = new RefmoResponse(e.getStackTrace());
+				rr = new RefmoResponse(e.getStackTrace(), e.getMessage(), e.getLocalizedMessage(), e.toString(), e.getCause().toString());
 				log.warning(e.getMessage());
 
 			}
@@ -164,7 +164,7 @@ public class MaintainManager {
 
 				catch (Exception e) {
 
-					rr = new RefmoResponse(e.getStackTrace());
+					rr = new RefmoResponse(e.getStackTrace(), e.getMessage(), e.getLocalizedMessage(), e.toString(), e.getCause().toString());
 					e.printStackTrace();
 
 				}

@@ -15,7 +15,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "Rule")
+@Table(name = "RULE")
 public class DBRule {
 
 	@Id

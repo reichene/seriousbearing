@@ -21,14 +21,28 @@ public class RefmoResponse {
 		
 		
 	}
-	public RefmoResponse(StackTraceElement[] stackTraceElements) {
+	public RefmoResponse(StackTraceElement[] stackTraceElements, String string, String string2, String string3, String string4) {
 
 		
-//		for (StackTraceElement stackTraceElement : stackTraceElements) {
-//			
-//			warning.add( stackTraceElement.toString());
-//		}
+		for (StackTraceElement stackTraceElement : stackTraceElements) {
+			
+			warning.add( stackTraceElement.toString());
+		}
 		
+		warning.add(string);
+		warning.add(string2);
+		warning.add(string3);
+		warning.add(string4);
+		
+	}
+	public List<String> getWarning() {
+		return warning;
+	}
+	public void setWarning(List<String> warning) {
+		this.warning = warning;
+	}
+	public void setDecision(Decision decision) {
+		this.decision = decision;
 	}
 	public RefmoResponse(Decision finalDecision) {
 		

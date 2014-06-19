@@ -26,7 +26,7 @@ public class EMFSingleton {
 	        	          SystemProperty.Environment.Value.Production) {
 	        	properties.put("javax.persistence.jdbc.driver", "com.mysql.jdbc.GoogleDriver");
 	        	properties.put("javax.persistence.jdbc.user", System.getProperty("cloudsql.user"));
-	        	properties.put("javax.persistence.jdbc.password", System.getProperty("cloudsql.password"));
+	        //	properties.put("javax.persistence.jdbc.password", System.getProperty("cloudsql.password"));
 	        	properties.put("javax.persistence.jdbc.url", System.getProperty("cloudsql.url")+System.getProperty("cloudsql.database"));
 	        	    } else {
 	        	properties.put("javax.persistence.jdbc.driver","com.mysql.jdbc.Driver");

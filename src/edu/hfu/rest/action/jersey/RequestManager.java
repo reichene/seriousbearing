@@ -60,7 +60,7 @@ public class RequestManager {
 		catch (Exception e) {
 
 		
-			rr = new RefmoResponse(e.getStackTrace());
+			rr = new RefmoResponse(e.getStackTrace(), e.getMessage(), e.getLocalizedMessage(), e.toString(), e.getCause().toString());
 			e.printStackTrace();
 
 		}
@@ -90,7 +90,8 @@ public class RequestManager {
 
 		catch (Exception e) {
 
-			rr = new RefmoResponse(e.getStackTrace());
+			
+			rr = new RefmoResponse(e.getStackTrace(), e.getMessage(), e.getLocalizedMessage(), e.toString(), e.getCause().toString());
 			e.printStackTrace();
 		}
 		return rr;

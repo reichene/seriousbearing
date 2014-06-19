@@ -99,10 +99,37 @@ public class RequestMaker {
 	           
 	           
 	         if(response.hasEntity()){
-	        	   
-	        	 
-	        	 decision =  response.getEntity(RefmoResponse.class).getDecision().toString();
-	        	 System.out.println("Decision: "+ decision);
+	        	 RefmoResponse res = null; 
+	        	 String res_string = null;
+	        try{
+	        	  res = response.getEntity(RefmoResponse.class);
+	        }
+	        catch(Exception e){
+	        	
+	        	res_string = response.getEntity(String.class);
+	        }
+	         	
+	        	 if(res != null){
+	        		 
+	        		 if(res.getDecision() != null){
+	        		 System.out.println("Decision: "+ res.getDecision().toString());
+	        		 
+	        		 
+	        	 }
+	        		 else{
+	        			 
+	        			 if(res.getWarning() != null){
+	        				 
+	        				 System.out.println("warning: " + res.getWarning().toString() );
+	        			 }
+	        			 System.out.println(res + " " + res.toString());
+	        			 
+	        		 }
+	        		 }
+	        	 else {
+	        		 
+	        		 System.out.println( res_string);
+	        	 } 
 	           }
 	  	         
 	       }

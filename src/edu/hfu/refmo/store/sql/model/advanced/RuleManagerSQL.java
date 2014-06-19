@@ -98,10 +98,10 @@ public class RuleManagerSQL {
 
 			if (category.getRoot_term() instanceof DBTerm_Condition) {
 
-				String att_que = " AND a.rule_id IN ( SELECT b.rule_id FROM rule AS a "
-						+ " LEFT OUTER JOIN category AS b "
+				String att_que = " AND a.rule_id IN ( SELECT b.rule_id FROM RULE AS a "
+						+ " LEFT OUTER JOIN CATEGORY AS b "
 						+ " ON a.rule_id = b.RULE_ID "
-						+ " LEFT OUTER JOIN term AS c "
+						+ " LEFT OUTER JOIN TERM AS c "
 						+ " ON b.category_id = c.CATEGORY_CATEGORY_ID "
 						+ " WHERE (b.category = '"
 						+ cat
@@ -134,10 +134,10 @@ public class RuleManagerSQL {
 
 						String begin_subquery = " AND a.rule_id IN ( ";
 
-						String att_que = " SELECT b.rule_id FROM rule AS a "
-								+ " LEFT OUTER JOIN category AS b "
+						String att_que = " SELECT b.rule_id FROM RULE AS a "
+								+ " LEFT OUTER JOIN CATEGORY AS b "
 								+ " ON a.rule_id = b.RULE_ID "
-								+ " LEFT OUTER JOIN term AS c "
+								+ " LEFT OUTER JOIN TERM AS c "
 								+ " ON b.category_id = c.CATEGORY_CATEGORY_ID "
 								+ " WHERE (b.category = '" + cat
 								+ "' AND c.NAME='"
@@ -221,8 +221,8 @@ public class RuleManagerSQL {
 		// +"ON b.category_id = c.CATEGORY_CATEGORY_ID " + where +
 		// query[0]+query[1];
 
-		String que = "SELECT DISTINCT a.rule_id FROM rule AS a LEFT JOIN category AS b "
-				+ "ON a.rule_id = b.RULE_ID LEFT JOIN term AS c "
+		String que = "SELECT DISTINCT a.rule_id FROM RULE AS a LEFT JOIN CATEGORY AS b "
+				+ "ON a.rule_id = b.RULE_ID LEFT JOIN TERM AS c "
 				+ "ON b.category_id = c.CATEGORY_CATEGORY_ID "
 				+ where
 				+ query[0] + query[1];
@@ -497,7 +497,7 @@ public class RuleManagerSQL {
 	public void deleteAll() {
 		
 		Integer items_deleted = 0;
-			String qlString = "Delete from Rule";
+			String qlString = "Delete from RULE";
 
 		EntityManager em = EMFSingleton.getEMF().createEntityManager();
 
