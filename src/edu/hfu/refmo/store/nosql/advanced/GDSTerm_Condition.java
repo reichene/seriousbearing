@@ -62,10 +62,10 @@ public class GDSTerm_Condition extends GDSTerm {
 		String as = " CONDITION ------------- \n ";
 		
 		
-		as+=this.comparision +"\n";
-		as+=this.name +"\n";
-		as+=this.term_key + "\n";
-		as+=this.value +"\n";
+		as+= " COMPARISION: "+ this.comparision +" ";
+		as+= " NAME " + this.name +" ";
+		as+= " TYPE " + this.term_key + " ";
+		as+="  VALUE" + this.value +"\n";
 	
 		return as;
 	}

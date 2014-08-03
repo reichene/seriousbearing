@@ -220,9 +220,16 @@ public class ReferenceMonitor {
 		}
 	}
 	
-	public void deleteRule(Category...categories){
+	public void deleteRule(boolean b, Category...categories){
+		if(!b){
+			
+			new RequestMaker(this.URI).delete(mapCategoriesToMaintainRequest(categories));
+			}
+		else {
+			new RequestMaker(this.URI).deleteByURI(mapCategoriesToMaintainRequest(categories));	
+				
+		}
 		
-		new RequestMaker(this.URI).delete(mapCategoriesToMaintainRequest(categories));
 		
 	}
 	
@@ -274,7 +281,7 @@ public class ReferenceMonitor {
 			ReferenceMonitor rm = new ReferenceMonitor("http://localhost:8888/");
 			rm.createRule("martin reichendecker", cats);
 			rm.updateRule(cats, cats_up);
-			rm.deleteRule(cats);
+			rm.deleteRule(true, cats);
 			rm.authorize( false, cats);
 			rm.authorize(true, cats);
 	}

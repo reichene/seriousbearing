@@ -5,17 +5,19 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
+import edu.hfu.refmo.logger.RefmoLogr;
 import edu.hfu.refmo.store.sql.manager.EMFSingleton;
 
-public class RuleManagerSQL {
+public class JPAORManager {
 
-	private static final Logger log = Logger.getLogger(RuleManagerSQL.class
+	private static final Logger log = Logger.getLogger(JPAORManager.class
 			.getName());
 	
 	public DBRule create(DBRule p_dbrule) {
@@ -103,14 +105,14 @@ public class RuleManagerSQL {
 						+ " ON a.rule_id = b.RULE_ID "
 						+ " LEFT OUTER JOIN TERM AS c "
 						+ " ON b.category_id = c.CATEGORY_CATEGORY_ID "
-						+ " WHERE (b.category = '"
+						+ " WHERE ( (b.category = '"
 						+ cat
 						+ "' AND c.NAME='"
 						+ ((DBTerm_Condition) category.getRoot_term())
 								.getName()
 						+ "') "
 						+ " OR ( b.category = '"
-						+ cat + "' AND c.CATEGORY_CATEGORY_ID IS NULL)  ";
+						+ cat + "' AND c.CATEGORY_CATEGORY_ID IS NULL ) )  ";
 
 				if (subquery == null) {
 					subquery = att_que;
@@ -139,11 +141,11 @@ public class RuleManagerSQL {
 								+ " ON a.rule_id = b.RULE_ID "
 								+ " LEFT OUTER JOIN TERM AS c "
 								+ " ON b.category_id = c.CATEGORY_CATEGORY_ID "
-								+ " WHERE (b.category = '" + cat
+								+ " WHERE ( ( b.category = '" + cat
 								+ "' AND c.NAME='"
 								+ ((DBTerm_Condition) dbterm).getName() + "') "
 								+ " OR ( b.category = '" + cat
-								+ "' AND c.CATEGORY_CATEGORY_ID IS NULL) ";
+								+ "' AND c.CATEGORY_CATEGORY_ID IS NULL ) ) ";
 
 						if (subquery == null) {
 							subquery = begin_subquery + att_que;
@@ -176,21 +178,46 @@ public class RuleManagerSQL {
 
 		String[] query = new String[2];
 
-		if (p_dbrule.getAction() != null) {
+if (p_dbrule.getAction() != null) {
+			
+			if(p_dbrule.getAction().getRoot_term() != null){
 
 			query = singleSubQuery(p_dbrule.getAction(), query);
+			}
+			
+			else{
+				
+				query = singleSubQueryNoCategory("ACTION", query);
+			}
 		}
 
-		if (p_dbrule.getResource() != null) {
+		
+if (p_dbrule.getResource() != null) {
+			
+			if(p_dbrule.getResource().getRoot_term() != null){
 
 			query = singleSubQuery(p_dbrule.getResource(), query);
-
+			}
+			
+			else{
+				
+				query = singleSubQueryNoCategory("RESOURCE", query);
+			}
 		}
+		
+		
 
 		if (p_dbrule.getSubject() != null) {
+			
+			if(p_dbrule.getSubject().getRoot_term() != null){
 
 			query = singleSubQuery(p_dbrule.getSubject(), query);
-
+			}
+			
+			else{
+				
+				query = singleSubQueryNoCategory("SUBJECT", query);
+			}
 		}
 
 		if (p_dbrule.getRule_priority() != null) {
@@ -205,7 +232,7 @@ public class RuleManagerSQL {
 			query[1] = " ";
 		}
 
-		String where = "WHERE a.rule_id IS NOT NULL ";
+		
 		// String que_erg = buildQueryString(p_dbrule);
 
 		// String que =
@@ -224,7 +251,7 @@ public class RuleManagerSQL {
 		String que = "SELECT DISTINCT a.rule_id FROM RULE AS a LEFT JOIN CATEGORY AS b "
 				+ "ON a.rule_id = b.RULE_ID LEFT JOIN TERM AS c "
 				+ "ON b.category_id = c.CATEGORY_CATEGORY_ID "
-				+ where
+				+ "WHERE a.rule_id IS NOT NULL"
 				+ query[0] + query[1];
 
 		log.info("Query:" + que);
@@ -233,16 +260,65 @@ public class RuleManagerSQL {
 
 	}
 
+	private String[] singleSubQueryNoCategory(String cat, String[] querystring) {
+	
+		
+		
+
+		String klammer = querystring[1];
+		String subquery = querystring[0];
+
+		
+		String att_que = " AND a.rule_id IN ( SELECT b.rule_id FROM RULE AS a "
+						+ " LEFT OUTER JOIN CATEGORY AS b "
+						+ " ON a.rule_id = b.RULE_ID "
+						+ " LEFT OUTER JOIN TERM AS c "
+						+ " ON b.category_id = c.CATEGORY_CATEGORY_ID "
+						+ " WHERE ( b.category = '"
+						+ cat + "' AND c.CATEGORY_CATEGORY_ID IS NULL )  ";
+
+				if (subquery == null) {
+					subquery = att_que;
+				} else {
+					subquery = subquery + att_que;
+				}
+
+				if (klammer == null) {
+					klammer = ")";
+				} else {
+					klammer = klammer + " ) ";
+				}
+
+			
+
+			
+	
+		
+
+		querystring[0] = subquery;
+		querystring[1] = klammer;
+
+		return querystring;
+
+	}
+
 	public List<DBRule> findByRuleId(List<Integer> rule_ids) {
 
 		List<DBRule> temp_dbrules = new ArrayList<DBRule>();
 
+
 		if (rule_ids != null) {
 			if (rule_ids.size() != 0) {
 				EntityManager em = EMFSingleton.getEMF().createEntityManager();
+				EntityTransaction tx = em.getTransaction();
+				
 				try {
-					em.getTransaction().begin();
-
+					tx.begin();
+					tx.setRollbackOnly();
+					
+					RefmoLogr reflog = new RefmoLogr("GETRULESFROMKEYS: MySQL Operation Select SQL");
+					reflog.start();
+					
 					CriteriaBuilder cb = em.getCriteriaBuilder();
 					CriteriaQuery<DBRule> cq = cb.createQuery(DBRule.class);
 					Root<DBRule> dbrule = cq.from(DBRule.class);
@@ -250,24 +326,33 @@ public class RuleManagerSQL {
 					cq.where(dbrule.get("rule_id").in(rule_ids));
 					TypedQuery<DBRule> q = em.createQuery(cq);
 					temp_dbrules = q.getResultList();
+					
+					reflog.stop();
+					
+					tx.rollback();
 
-					em.getTransaction().commit();
-
-				} finally {
-					if (em.getTransaction().isActive()) {
-						em.getTransaction().rollback();
-					}
-
-					em.close();
+				} 	finally
+				{
+				    if (tx.isActive())
+				    {
+				        tx.rollback();
+				    }
 				}
+				em.close();
 
-				for (DBRule dbRule : temp_dbrules) {
-					log.info(dbRule.toString());
 
-				}
+//
+//				}
 			}
 		}
 
+		//logging
+		for (DBRule dbRule : temp_dbrules) {
+			log.info(dbRule.toString());
+		}
+		//logging
+		
+		
 		return temp_dbrules;
 
 	}
@@ -281,23 +366,34 @@ public class RuleManagerSQL {
 	public List<Integer> findRelevantRuleIds(DBRule p_dbrule) {
 
 		EntityManager em = EMFSingleton.getEMF().createEntityManager();
+		EntityTransaction tx = em.getTransaction();
 		List<Integer> result = new ArrayList<Integer>();
+		
+		log.info("BEGIN WITH FIND QUERY AND PARAMETERS: " +p_dbrule.toString() );
 
 		try {
-			em.getTransaction().begin();
-
+			tx.begin();
+			tx.setRollbackOnly();
+			
+			RefmoLogr reflog = new RefmoLogr("KEYSELECTIONTIME: MySQL Operation Select SQL");
+			reflog.start();
+			
 			Query query = em.createNativeQuery(buildQueryString(p_dbrule),
 					Integer.class);
 			result = query.getResultList();
+			
+			reflog.stop();
 
-			em.getTransaction().commit();
-		} finally {
-			if (em.getTransaction().isActive()) {
-				em.getTransaction().rollback();
-			}
-
-			em.close();
+			tx.rollback();
 		}
+		finally
+		{
+		    if (tx.isActive())
+		    {
+		        tx.rollback();
+		    }
+		}
+		em.close();
 		log.info(result.size() + " RuleIds found!");
 
 		return result;
@@ -307,10 +403,12 @@ public class RuleManagerSQL {
 	public List<DBRule> findAll() {
 
 		EntityManager em = EMFSingleton.getEMF().createEntityManager();
+		EntityTransaction tx = em.getTransaction();
 		List<DBRule> r_all_dbrules = new ArrayList<DBRule>();
 
 		try {
-			em.getTransaction().begin();
+			tx.begin();
+			tx.setRollbackOnly();
 			// ---------------------------------------------
 
 			CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -321,14 +419,17 @@ public class RuleManagerSQL {
 			r_all_dbrules = q.getResultList();
 
 			// ---------------------------------------------
-			em.getTransaction().commit();
-		} finally {
-			if (em.getTransaction().isActive()) {
-				em.getTransaction().rollback();
-			}
-
-			em.close();
+			//em.getTransaction().commit();
+			tx.rollback();
 		}
+		finally
+		{
+		    if (tx.isActive())
+		    {
+		        tx.rollback();
+		    }
+		}
+		em.close();
 
 		return r_all_dbrules;
 
@@ -519,6 +620,36 @@ public class RuleManagerSQL {
 		}
 	
 		
+	}
+
+	public int count() {
+		Integer items= 0;
+		String qlString = "Select * from RULE";
+
+	EntityManager em = EMFSingleton.getEMF().createEntityManager();
+	EntityTransaction tx = em.getTransaction();
+	try {
+		tx.begin();
+		tx.setRollbackOnly();
+
+		Query q = em.createNativeQuery(qlString);
+		items = q.getResultList().size();
+
+		
+		em.getTransaction().commit();
+
+	 	tx.rollback();
+	}
+	finally
+	{
+	    if (tx.isActive())
+	    {
+	        tx.rollback();
+	    }
+	}
+	em.close();
+	
+	return items;
 	}
 
 }

@@ -21,15 +21,22 @@ import edu.hfu.refmo.store.nosql.advanced.GDSRule.DSElements;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 
-public class RuleStoreManagerNoSql {
+public class DatastoreManager {
 
 	public GDSRule create(AttributeTreeElement ruleRootElement,
 			Subject subject, Action action, Resource resource, Decision decision) {
 
-		return new GDSRule("description", ruleRootElement,
+		GDSRule new_gdsrule = new GDSRule("description", ruleRootElement,
 				(subject != null ? subject.getRootElement() : null),
 				(action != null ? action.getRootElement() : null),
 				(resource != null ? resource.getRootElement() : null), decision);
+		
+		
+		
+		new GDSSelectionOptimizer().createOptimizationKeys(new_gdsrule.getRule_key(), ruleRootElement,	subject, action, resource);
+		
+		
+		return new_gdsrule;
 
 	}
 
@@ -194,8 +201,14 @@ public class RuleStoreManagerNoSql {
 						: null), (resource != null ? resource.getRootElement()
 						: null));
 
-
-		return new GDSEntityManager().find(attributeMap);
+		
+		// select 1
+				 new GDSEntityManager().find(attributeMap);
+		
+		// select2
+	return new GDSEntityManager().find(new GDSSelectionOptimizer().getCombinationFilter(ruleRootElement,	subject, action, resource));
+		
+		
 	}
 
 	private Map<String, List<List<String>>> prepareAttributesForFindOps(
@@ -210,20 +223,32 @@ public class RuleStoreManagerNoSql {
 
 		}
 
-		if (subject != null) {
+//		if (subject != null) {
+//			attributeMap
+//					.put(GDSCategory.SUBJECT.name(), getCatAttributeList(GDSCategory.SUBJECT.name(), subject));
+//
+//		}
+//
+//		if (action != null) {
+//			attributeMap.put(GDSCategory.ACTION.name(), getCatAttributeList(GDSCategory.ACTION.name(), action));
+//		}
+//
+//		if (resource != null) {
+//			attributeMap.put(GDSCategory.RESOURCE.name(),
+//					getCatAttributeList(GDSCategory.RESOURCE.name(), resource));
+//		}
+//		
+//		
+//			attributeMap.put(GDSCategory.RULE_PRIORITY.name(),
+//					getCatAttributeList(GDSCategory.RULE_PRIORITY.name(), ruleRootElement));
 			attributeMap
 					.put(GDSCategory.SUBJECT.name(), getCatAttributeList(GDSCategory.SUBJECT.name(), subject));
-
-		}
-
-		if (action != null) {
+		
 			attributeMap.put(GDSCategory.ACTION.name(), getCatAttributeList(GDSCategory.ACTION.name(), action));
-		}
-
-		if (resource != null) {
+		
 			attributeMap.put(GDSCategory.RESOURCE.name(),
 					getCatAttributeList(GDSCategory.RESOURCE.name(), resource));
-		}
+
 		return attributeMap;
 
 	}
@@ -296,6 +321,11 @@ public class RuleStoreManagerNoSql {
 	public void deleteAll() {
 		new GDSEntityManager().deleteAll();
 		
+	}
+
+	public int count() {
+		
+		return new GDSEntityManager().count();
 	}
 
 }

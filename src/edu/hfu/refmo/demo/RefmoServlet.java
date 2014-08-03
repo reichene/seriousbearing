@@ -1,15 +1,21 @@
 package edu.hfu.refmo.demo;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+
 import de.abacs.base.entity.Action;
 import de.abacs.base.entity.Condition;
 import de.abacs.base.entity.Condition.Comparision;
+import de.abacs.base.entity.AttributeTreeElement;
 import de.abacs.base.entity.Decision;
 import de.abacs.base.entity.Resource;
 import de.abacs.base.entity.Rule;
@@ -20,22 +26,26 @@ import edu.hfu.refmo.client.Conjunction;
 import edu.hfu.refmo.client.ReferenceMonitor;
 import edu.hfu.refmo.client.RulePriority;
 import edu.hfu.refmo.client.Conjunction.Function;
+import edu.hfu.refmo.logger.RefmoLogr;
 import edu.hfu.refmo.processor.ProcessorManager;
 import edu.hfu.refmo.query.QueryManagerImpl;
-import edu.hfu.refmo.store.nosql.advanced.RuleStoreManagerGDatastore;
-import edu.hfu.refmo.store.sql.model.advanced.RuleStoreManagerSqlDAOAdvanced;
+import edu.hfu.refmo.store.nosql.advanced.NoSqlRuleStore;
+import edu.hfu.refmo.store.sql.model.advanced.SqlRuleStore;
 import edu.hfu.refmo.testing.TestDataGenerator;
-import edu.hfu.rest.action.jersey.RequestManager;
+import edu.hfu.rest.action.jersey.RequestController;
 import edu.hfu.rest.action.model.RefmoResponse;
 
 @SuppressWarnings("serial")
 public class RefmoServlet extends HttpServlet {
 	
-	private static final Logger log = Logger.getLogger(RequestManager.class.getName());
+	private static final Logger log = Logger.getLogger(RequestController.class.getName());
+	private static boolean store = false;
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
 		resp.setContentType("text/plain");
+		
+	
 		
 		/*
 		 *  Datastore
@@ -553,16 +563,24 @@ public class RefmoServlet extends HttpServlet {
 //			 
 //				resp.getWriter().println("Hello, world - Demo application  finished successfully");
 			 
+		
+		String database = req.getParameter("sql");
+		
+		
+	// SQL
+	if(database != null ){
+		if(database.equals("true")){
+
+			store = true;
+	
+		}
+	}
 			 
 			 /***
 			  * 
 			  * generate random test data
 			  * 
 			  */
-			 
-		//	 generateRandomRules(11);
-			 
-		
 		
 		  String new_query = req.getParameter("query");
 		  
@@ -573,91 +591,211 @@ public class RefmoServlet extends HttpServlet {
 			  * 
 			  */
 			TestDataGenerator tdg =  new TestDataGenerator();
-			String nosql_true = req.getParameter("sql");
+	
+			String sql_true = req.getParameter("sqldelete");
 			RuleStore rsmgd = null;
+			
+			// SQL
+			if(sql_true != null ){
+				if(sql_true.equals("true")){
+					rsmgd = new SqlRuleStore();
+					
+					RefmoLogr sqlDeleteAll = new RefmoLogr("Delete All SQL");
+					sqlDeleteAll.start();
+					
+					((SqlRuleStore)rsmgd).deleteAll();
+					
+					sqlDeleteAll.stop();
+			}}
+		
+			String nosql_true = req.getParameter("nosqldelete");
+			
 			
 			// SQL
 			if(nosql_true != null ){
 				if(nosql_true.equals("true")){
-					rsmgd = new RuleStoreManagerSqlDAOAdvanced();
-					((RuleStoreManagerSqlDAOAdvanced)rsmgd).deleteAll();
+					rsmgd = new NoSqlRuleStore();
+					RefmoLogr sqlDeleteAll = new RefmoLogr("Delete All NoSQL");
+					sqlDeleteAll.start();
+					((NoSqlRuleStore)rsmgd).deleteAll();
+
+					sqlDeleteAll.stop();
 			
 			}}
-			else{
-			// NOSQL
-		
-			
-			rsmgd = new RuleStoreManagerGDatastore();
-			 ((RuleStoreManagerGDatastore)rsmgd).deleteAll();
-			}
-			 
-			 rsmgd.create((tdg.getRulePrioAttributeTreeElement()),
-					 ((Subject)tdg.generateAbstractElementByCategory("S")), 
-					 ((Action)tdg.generateAbstractElementByCategory("A")),
-					 ((Resource)tdg.generateAbstractElementByCategory("R")),
-					 Decision.DENY);
-			 
-		
-			 rsmgd.findAll();
-		 
-			 rsmgd.find((tdg.getRulePrioAttributeTreeElement()),
-					 ((Subject)tdg.generateAbstractElementByCategory("S")),
-					((Action)tdg.generateAbstractElementByCategory("A")),
-					((Resource)tdg.generateAbstractElementByCategory("R")));
-			 
-		
-			 
-			/**
-			 * not to delete
-			 */
-			 rsmgd.create(new Condition("rp2", Comparision.EQUAL, "no matter"),
-					 new Subject(new Condition("s2", Comparision.EQUAL, "zack")),
-					 new Action(new Condition("a2", Comparision.EQUAL, "zack")),
-					 new Resource(new Condition("r2", Comparision.EQUAL, "zack")),  Decision.PERMIT);
 			 
 			
-			 rsmgd.create(new Condition("rp1", Comparision.EQUAL, "no matter"),
-					 new Subject(new Condition("s1", Comparision.EQUAL, "zack")),
-					 new Action(new Condition("a1", Comparision.EQUAL, "zack")),
-					 new Resource(new Condition("r1", Comparision.EQUAL, "zack")),  Decision.PERMIT);
-			 
-			 
-			 rsmgd.create(new Condition("rp1", Comparision.EQUAL, "no matter"),
-					 null,
-					 new Action(new Condition("a1", Comparision.EQUAL, "zack")),
-					 new Resource(new Condition("r1", Comparision.EQUAL, "zack")),  Decision.PERMIT);
-			 
-			 
-			 rsmgd.create(new Condition("rp1", Comparision.EQUAL, "no matter"),
-					 null,
-				     null,
-					 new Resource(new Condition("r1", Comparision.EQUAL, "zack")),  Decision.PERMIT);
-			 
-		
-			 rsmgd.find(new Condition("rp1", Comparision.EQUAL, "no matter"),
-					 new Subject(new Condition("s1", Comparision.EQUAL, "zack")),
-					 null,
-					 new Resource(new Condition("r1", Comparision.EQUAL, "zack")));
-			 
-			 rsmgd.find(new Condition("rp1", de.abacs.base.entity.Condition.Comparision.EQUAL, "no matter"),
-					 new Subject(new Condition("s1", de.abacs.base.entity.Condition.Comparision.EQUAL, "zack")),
-					 new Action(new Condition("a1", de.abacs.base.entity.Condition.Comparision.EQUAL, "zack")),
-					 new Resource(new Condition("r1", de.abacs.base.entity.Condition.Comparision.EQUAL, "zack")));
-			 
-			 
+				String createcust_true = req.getParameter("createcustom");
+			
+			
+			// SQL
+			if(createcust_true != null ){
+	
 
+					RefmoLogr sqlDeleteAll = new RefmoLogr("Create Custom Rules");
+					sqlDeleteAll.start();
+					
+					testcreateRules(Integer.parseInt(createcust_true));
+						
+					sqlDeleteAll.stop();
+			
+			}
+			
 			 
-			 rsmgd.update(
-					 new Condition("rp1", de.abacs.base.entity.Condition.Comparision.EQUAL, "no matter"),
-					 new Subject(new Condition("s1", de.abacs.base.entity.Condition.Comparision.EQUAL, "zack")),
-					 new Action(new Condition("a1", de.abacs.base.entity.Condition.Comparision.EQUAL, "zack")),
-					 new Resource(new Condition("r1", de.abacs.base.entity.Condition.Comparision.EQUAL, "zack")), 
-					 
-					 new Condition("rp3", de.abacs.base.entity.Condition.Comparision.EQUAL, "no matter"),
-					 new Subject(new Condition("s3", de.abacs.base.entity.Condition.Comparision.EQUAL, "zack")),
-					 new Action(new Condition("a3", de.abacs.base.entity.Condition.Comparision.EQUAL, "zack")),
-					 new Resource(new Condition("r3", de.abacs.base.entity.Condition.Comparision.EQUAL, "zack")));
-					 
+			 
+			
+			 
+				String update_rules = req.getParameter("update");
+				 
+				// SQL
+				if(update_rules != null ){
+					if(update_rules.equals("true")){
+			
+						RefmoLogr sqlDeleteAll = new RefmoLogr("Update Rules");
+						sqlDeleteAll.start();
+						
+						 testupdateRules();
+						 
+					
+							sqlDeleteAll.stop();
+				}}
+				
+				
+				String count_rules = req.getParameter("count");
+				 
+				// SQL
+				if(count_rules != null ){
+					if(count_rules.equals("true")){
+			
+						 getCountRules();
+						 
+					
+						
+				}}
+				 
+		
+			 
+				String delete_entries = req.getParameter("delete");
+			 
+				// SQL
+				if(delete_entries != null ){
+					if(delete_entries.equals("true")){
+						
+						RefmoLogr sqlDeleteAll = new RefmoLogr("Delete custom Rules");
+						sqlDeleteAll.start();
+						 testdeleteRules();
+					
+							sqlDeleteAll.stop();
+							
+				
+				}}
+				 
+			
+			 
+				String create_entries = req.getParameter("create");
+				
+				
+				// SQL
+				if(create_entries != null ){
+					
+					
+//					Queue queue = QueueFactory.getDefaultQueue();
+//					queue.add(withPayload(ne));
+					
+					RefmoLogr sqlDeleteAll = new RefmoLogr("generate random rules");
+					sqlDeleteAll.start();
+						 generateRandomRules(Integer.parseInt(create_entries));
+						// System.out.println(create_entries);
+						 
+			
+					sqlDeleteAll.stop();
+						 
+					
+				
+			}
+				 
+				String find_entries = req.getParameter("find");
+				 
+				// SQL
+				if(find_entries != null ){
+					if(find_entries.equals("true")){
+						
+						RefmoLogr sqlDeleteAll = new RefmoLogr("Find custom rules");
+						sqlDeleteAll.start();
+						
+						 testfindRules();
+					
+							sqlDeleteAll.stop();	
+				
+				}}
+			
+		
+//			 rsmgd.create((tdg.getRulePrioAttributeTreeElement()),
+//					 ((Subject)tdg.generateAbstractElementByCategory("S")), 
+//					 ((Action)tdg.generateAbstractElementByCategory("A")),
+//					 ((Resource)tdg.generateAbstractElementByCategory("R")),
+//					 Decision.DENY);
+//			 
+//		
+//			 rsmgd.findAll();
+//		 
+//			 rsmgd.find((tdg.getRulePrioAttributeTreeElement()),
+//					 ((Subject)tdg.generateAbstractElementByCategory("S")),
+//					((Action)tdg.generateAbstractElementByCategory("A")),
+//					((Resource)tdg.generateAbstractElementByCategory("R")));
+//			 
+//		
+//			 
+//			/**
+//			 * not to delete
+//			 */
+//			 rsmgd.create(new Condition("rp2", Comparision.EQUAL, "no matter"),
+//					 new Subject(new Condition("s2", Comparision.EQUAL, "zack")),
+//					 new Action(new Condition("a2", Comparision.EQUAL, "zack")),
+//					 new Resource(new Condition("r2", Comparision.EQUAL, "zack")),  Decision.PERMIT);
+//			 
+//			
+//			 rsmgd.create(new Condition("rp1", Comparision.EQUAL, "no matter"),
+//					 new Subject(new Condition("s1", Comparision.EQUAL, "zack")),
+//					 new Action(new Condition("a1", Comparision.EQUAL, "zack")),
+//					 new Resource(new Condition("r1", Comparision.EQUAL, "zack")),  Decision.PERMIT);
+//			 
+//			 
+//			 rsmgd.create(new Condition("rp1", Comparision.EQUAL, "no matter"),
+//					 null,
+//					 new Action(new Condition("a1", Comparision.EQUAL, "zack")),
+//					 new Resource(new Condition("r1", Comparision.EQUAL, "zack")),  Decision.PERMIT);
+//			 
+//			 
+//			 rsmgd.create(new Condition("rp1", Comparision.EQUAL, "no matter"),
+//					 null,
+//				     null,
+//					 new Resource(new Condition("r1", Comparision.EQUAL, "zack")),  Decision.PERMIT);
+//			 
+//		
+//			 rsmgd.find(new Condition("rp1", Comparision.EQUAL, "no matter"),
+//					 new Subject(new Condition("s1", Comparision.EQUAL, "zack")),
+//					 null,
+//					 new Resource(new Condition("r1", Comparision.EQUAL, "zack")));
+//			 
+//			 rsmgd.find(new Condition("rp1", de.abacs.base.entity.Condition.Comparision.EQUAL, "no matter"),
+//					 new Subject(new Condition("s1", de.abacs.base.entity.Condition.Comparision.EQUAL, "zack")),
+//					 new Action(new Condition("a1", de.abacs.base.entity.Condition.Comparision.EQUAL, "zack")),
+//					 new Resource(new Condition("r1", de.abacs.base.entity.Condition.Comparision.EQUAL, "zack")));
+//			 
+//			 
+//
+//			 
+//			 rsmgd.update(
+//					 new Condition("rp1", de.abacs.base.entity.Condition.Comparision.EQUAL, "no matter"),
+//					 new Subject(new Condition("s1", de.abacs.base.entity.Condition.Comparision.EQUAL, "zack")),
+//					 new Action(new Condition("a1", de.abacs.base.entity.Condition.Comparision.EQUAL, "zack")),
+//					 new Resource(new Condition("r1", de.abacs.base.entity.Condition.Comparision.EQUAL, "zack")), 
+//					 
+//					 new Condition("rp3", de.abacs.base.entity.Condition.Comparision.EQUAL, "no matter"),
+//					 new Subject(new Condition("s3", de.abacs.base.entity.Condition.Comparision.EQUAL, "zack")),
+//					 new Action(new Condition("a3", de.abacs.base.entity.Condition.Comparision.EQUAL, "zack")),
+//					 new Resource(new Condition("r3", de.abacs.base.entity.Condition.Comparision.EQUAL, "zack")));
+//					 
 //				
 //
 //			 
@@ -685,11 +823,11 @@ public class RefmoServlet extends HttpServlet {
 			  
 			
 				
-				// SQL
-				if(new_query != null ){
-					if(new_query.equals("true")){
-				new ReferenceMonitor().example();
-					}}
+//				// SQL
+//				if(new_query != null ){
+//					if(new_query.equals("true")){
+//				new ReferenceMonitor().example();
+//					}}
 	}
 	
 	
@@ -719,6 +857,314 @@ public class RefmoServlet extends HttpServlet {
 //		
 //	}
 	
+	
+public static void getCountRules() {
+	RuleStore rsmgd = null;
+	
+	   // RuleStore rs = new RuleStoreManagerSqlDAOAdvanced(); 
+       //RuleStore rs = new RuleStoreManagerGDatastore();
+
+	  if(store){
+		  
+		 log.info("total entries: " + new SqlRuleStore().count()); 
+		  
+	  }
+	  else{
+		  log.info("total entries: " + new NoSqlRuleStore().count()); 
+		  
+		  
+	  }
+	  
+	  store=false;
+		
+	}
+
+
+public static void testdeleteRules(){
+	
+		
+		
+		RefmoResponse rr = null;
+		
+try {
+			
+			
+	Rule rule = new Rule(
+			new Condition("rp2", Comparision.EQUAL, "value"),
+			new Subject(new Condition("s2", Comparision.EQUAL,"value")),
+			new Action(new Condition("a2", Comparision.EQUAL,"value")),
+			new Resource(new Condition("r2", Comparision.EQUAL,"value")),
+			Decision.PERMIT);
+	
+				
+			
+				rr = ProcessorManager.process(store, new QueryManagerImpl().delete(
+						rule.getRootElement(),
+						(rule.getSubject() != null ? rule.getSubject().getRootElement(): null),
+						(rule.getAction() != null ? rule.getAction().getRootElement() : null),
+						(rule.getResource() != null ? rule.getResource().getRootElement(): null)
+						
+						));
+		    
+		
+			}
+
+		catch (Exception e) {
+
+		
+			e.printStackTrace();
+
+		}
+		
+		
+		
+		
+}
+public static void testupdateRules(){
+	
+			RefmoResponse rr = null;
+		
+try {
+			
+			
+	Rule rule = new Rule(
+			new Condition("rp1", Comparision.EQUAL, "value"),
+			new Subject(new Condition("s1", Comparision.EQUAL,"value")),
+			new Action(new Condition("a1", Comparision.EQUAL,"value")),
+			new Resource(new Condition("r1", Comparision.EQUAL,"value")),
+			Decision.PERMIT);
+	
+	Rule urule = new Rule(
+			new Condition("rp3", Comparision.EQUAL, "value"),
+			new Subject(new Condition("s3", Comparision.EQUAL,"value")),
+			new Action(new Condition("a3", Comparision.EQUAL,"value")),
+			new Resource(new Condition("r3", Comparision.EQUAL,"value")),
+			Decision.PERMIT);
+				
+			
+				rr = ProcessorManager.process(store, new QueryManagerImpl().update(
+						rule.getRootElement(),
+						(rule.getSubject() != null ? rule.getSubject().getRootElement(): null),
+						(rule.getAction() != null ? rule.getAction().getRootElement() : null),
+						(rule.getResource() != null ? rule.getResource().getRootElement(): null),
+						urule.getRootElement(),
+						(urule.getSubject() != null ? urule.getSubject().getRootElement(): null),
+						(urule.getAction() != null ? urule.getAction().getRootElement() : null),
+						(urule.getResource() != null ? urule.getResource().getRootElement(): null)
+						
+						));
+		    
+		
+			}
+
+		catch (Exception e) {
+
+		
+			e.printStackTrace();
+
+		}
+			
+}
+private static void  testfindRules(){
+	try {
+		
+		List<Rule> rules = new ArrayList<Rule>();
+		
+		
+//		rules.add(new Rule(
+//				new Condition("rp2", Comparision.EQUAL, "value"),
+//				new Subject(new Condition("s2", Comparision.EQUAL,"value")),
+//				null,
+//				new Resource(new Condition("r2", Comparision.EQUAL,"value")),
+//				Decision.PERMIT));
+//		
+//		
+//		rules.add(new Rule(
+//				null,
+//				null,
+//				null,
+//				null,
+//				Decision.PERMIT));
+		
+		
+		rules.add(new Rule(
+				new Condition("rp1", Comparision.EQUAL, "value"),
+				new Subject(new Condition("s3", Comparision.EQUAL,"value")),
+				new Action(new Condition("a3", Comparision.EQUAL,"value")),
+				new Resource(new Condition("r3", Comparision.EQUAL,"value")),
+				Decision.PERMIT));
+		
+//		rules.add(new Rule(
+//				new Condition("rp1", Comparision.EQUAL, "value"),
+//				new Subject(new Condition("s1", Comparision.EQUAL,"value")),
+//				null,
+//				new Resource(new Condition("r1", Comparision.EQUAL,"value")),
+//				Decision.PERMIT));
+//		
+//		rules.add(new Rule(
+//				new Condition("rp1", Comparision.EQUAL, "value"),
+//				new Subject(new Condition("s1", Comparision.EQUAL,"value")),
+//				new Action(new Condition("a2", Comparision.EQUAL,"value")),
+//				new Resource(new Condition("r1", Comparision.EQUAL,"value")),
+//				Decision.PERMIT));
+//		
+//		rules.add(new Rule(
+//				new Condition("rp1", Comparision.EQUAL, "value"),
+//				new Subject(new Condition("s1", Comparision.EQUAL,"value")),
+//				new Action(new Condition("a2", Comparision.EQUAL,"value")),
+//				new Resource(new Condition("r2", Comparision.EQUAL,"value")),
+//				Decision.PERMIT));
+//		
+		
+
+		
+		
+
+		RefmoResponse rr = null;
+		
+
+	
+		for (Rule rule : rules) {
+			
+		
+			rr = ProcessorManager.process(store, new QueryManagerImpl().read(
+					rule.getRootElement(),
+					(rule.getSubject() != null ? rule.getSubject().getRootElement(): null),
+					(rule.getAction() != null ? rule.getAction().getRootElement() : null),
+					(rule.getResource() != null ? rule.getResource().getRootElement(): null)
+					
+					));
+	    
+	}
+		}
+
+	catch (Exception e) {
+
+	
+		e.printStackTrace();
+
+	}
+	
+}
+	
+
+	
+	private static void  testcreateRules(int anzahl){
+		try {
+			
+			List<Rule> rules = new ArrayList<Rule>();
+			
+			rules.add(new Rule(
+					new Condition("rp2", Comparision.EQUAL, "value"),
+					new Subject(new Condition("s2", Comparision.EQUAL,"value")),
+					new Action(new Condition("a2", Comparision.EQUAL,"value")),
+					new Resource(new Condition("r2", Comparision.EQUAL,"value")),
+					Decision.PERMIT));
+			
+			rules.add(new Rule(
+					new Condition("rp2", Comparision.EQUAL, "value"),
+					new Subject(new Condition("s1", Comparision.EQUAL,"value")),
+					new Action(new Condition("a1", Comparision.EQUAL,"value")),
+					new Resource(new Condition("r1", Comparision.EQUAL,"value")),
+					Decision.PERMIT));
+			
+			rules.add(new Rule(
+					null,
+					new Subject(new Condition("s1", Comparision.EQUAL,"value")),
+					new Action(new Condition("a1", Comparision.EQUAL,"value")),
+					new Resource(new Condition("r1", Comparision.EQUAL,"value")),
+					Decision.PERMIT));
+			
+			rules.add(new Rule(
+					null,
+					new Subject(new Condition("s3", Comparision.EQUAL,"value")),
+					new Action(new Condition("a3", Comparision.EQUAL,"value")),
+					new Resource(new Condition("r3", Comparision.EQUAL,"value")),
+					Decision.PERMIT));
+			
+			rules.add(new Rule(
+					new Condition("rp1", Comparision.EQUAL, "value"),
+					new Subject(new Condition("s1", Comparision.EQUAL,"value")),
+					new Action(new Condition("a1", Comparision.EQUAL,"value")),
+					null,
+					Decision.PERMIT));
+			
+			
+			rules.add(new Rule(
+					new Condition("rp1", Comparision.EQUAL, "value"),
+					new Subject(new Condition("s1", Comparision.EQUAL,"value")),
+					null,
+					new Resource(new Condition("r1", Comparision.EQUAL,"value")),
+					Decision.PERMIT));
+			
+			rules.add(new Rule(
+					new Condition("rp2", Comparision.EQUAL, "value"),
+					new Subject(new Condition("s1", Comparision.EQUAL,"value")),
+					null,
+					null,
+					Decision.PERMIT));
+			
+			rules.add(new Rule(
+					new Condition("rp2", Comparision.EQUAL, "value"),
+					null,
+					new Action(new Condition("a1", Comparision.EQUAL,"value")),
+					new Resource(new Condition("r1", Comparision.EQUAL,"value")),
+					Decision.PERMIT));
+			
+			rules.add(new Rule(
+					new Condition("rp2", Comparision.EQUAL, "value"),
+					null,
+					new Action(new Condition("a1", Comparision.EQUAL,"value")),
+					null,
+					Decision.PERMIT));
+			
+			rules.add(new Rule(
+					new Condition("rp2", Comparision.EQUAL, "value"),
+					null,
+					null,
+					new Resource(new Condition("r1", Comparision.EQUAL,"value")),
+					Decision.PERMIT));
+			
+			rules.add(new Rule(
+					new Condition("rp1", Comparision.EQUAL, "value"),
+					null,
+					null,
+					null,
+					Decision.PERMIT));
+			
+
+			
+			
+	
+			RefmoResponse rr = null;
+			
+			for (int i = 0; i < anzahl; i++) {
+				
+			
+		
+			for (Rule rule : rules) {
+				
+			
+				rr = ProcessorManager.process(store, new QueryManagerImpl().create(
+						rule.getRootElement(),
+						(rule.getSubject() != null ? rule.getSubject().getRootElement(): null),
+						(rule.getAction() != null ? rule.getAction().getRootElement() : null),
+						(rule.getResource() != null ? rule.getResource().getRootElement(): null),
+						(rule.getDecision() != null ? rule.getDecision() : null)
+						));
+		    
+		}
+			}}
+
+		catch (Exception e) {
+
+		
+			e.printStackTrace();
+
+		}
+		
+	}
+	
 	private static void  generateRandomRules(int numberTestData){
 		
 		
@@ -728,14 +1174,14 @@ public class RefmoServlet extends HttpServlet {
 				
 				
 				
-				for (int i = 0; i <= numberTestData; i++) {
+				for (int i = 0; i < numberTestData; i++) {
 					Rule new_rule = tdg.randomMaintainRequest().getRule();
-					rr = ProcessorManager.process(new QueryManagerImpl().create(
+					rr = ProcessorManager.process(store, new QueryManagerImpl().create(
 							new_rule.getRootElement(),
-							new_rule.getSubject().getRootElement(),
-							new_rule.getResource().getRootElement(),
-							new_rule.getAction().getRootElement(),
-							new_rule.getDecision()	
+							(new_rule.getSubject() != null ? new_rule.getSubject().getRootElement(): null),
+							(new_rule.getAction() != null ? new_rule.getAction().getRootElement() : null),
+							(new_rule.getResource() != null ? new_rule.getResource().getRootElement(): null),
+							(new_rule.getDecision() != null ? new_rule.getDecision() : null)
 							));
 			    }
 			}

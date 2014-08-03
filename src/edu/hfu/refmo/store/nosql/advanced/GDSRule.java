@@ -282,27 +282,27 @@ public class GDSRule {
 		
 		String as = " RULE BEGIN -------------------\n";
 		
-		as = as + " KEY " + this.rule_key +"\n";
-		as = as + " DEC " + this.decision +"\n";
-		as = as + " DES " + this.description + "\n";
+		as = as + " ENTIY KEY " + this.rule_key +" ";
+		as = as + " ENTIY DECISION " + this.decision +" ";
+		as = as + " DESCRIPTION " + this.description + "\n";
 		
 		
 		as = as + "---------- ACTION \n";
 		if(this.category_action != null){
-		as = as + " action " + this.category_action.toString();}
+		as = as + "  " + this.category_action.toString();}
 		
 		as = as + "---------- RESOURC \n";
 		if(this.category_resource != null){
-		as = as + " resource "+ this.category_resource.toString();
+		as = as + " "+ this.category_resource.toString();
 		}
 		as = as + "---------- RULEPRIO \n";
 		if(this.category_rule_priority!= null){
-		as = as + " prio " + this.category_rule_priority.toString();
+		as = as + " " + this.category_rule_priority.toString();
 		}
 		
 		as = as + "---------- SUBJECT \n";
 		if(this.category_subject != null){
-		as = as + " subject " + this.category_subject.toString();
+		as = as + "  " + this.category_subject.toString();
 		}
 		return as;
 		

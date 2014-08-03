@@ -15,13 +15,14 @@ import de.abacs.base.entity.Resource;
 import de.abacs.base.entity.Rule;
 import de.abacs.base.entity.Subject;
 import de.abacs.base.store.RuleStore;
+import edu.hfu.refmo.logger.RefmoLogr;
 
 
 
 
-public class RuleStoreManagerSqlDAOAdvanced implements RuleStore {
+public class SqlRuleStore implements RuleStore {
 	
-	private static final Logger log = Logger.getLogger(RuleStoreManagerSqlDAOAdvanced.class
+	private static final Logger log = Logger.getLogger(SqlRuleStore.class
 			.getName());
 
 	private DBTerm mapAttributeTreeElementToInternalTerm(AttributeTreeElement p_ate){
@@ -81,7 +82,7 @@ public class RuleStoreManagerSqlDAOAdvanced implements RuleStore {
 			
 			if(p_dbterm instanceof DBTerm_Condition)	{
 				
-				log.info("Condition" + ((DBTerm_Condition) p_dbterm).getComparision_string());
+				//log.info("Condition" + ((DBTerm_Condition) p_dbterm).getComparision_string());
 				
 				Comparision new_comp = null;
 				
@@ -109,13 +110,13 @@ public class RuleStoreManagerSqlDAOAdvanced implements RuleStore {
 					new_comp = Comparision.EQUAL;
 				}
 				
-				log.info(new_comp.toString());
+				//log.info(new_comp.toString());
 				
 				r_ate= new Condition(((DBTerm_Condition) p_dbterm).getName(), new_comp, ((DBTerm_Condition) p_dbterm).getValue());
 			}
 			else if (p_dbterm instanceof DBTerm_Conjunction){
 				
-				log.info("Conjunction" + ((DBTerm_Conjunction) p_dbterm).getFunction_string() );
+				//log.info("Conjunction" + ((DBTerm_Conjunction) p_dbterm).getFunction_string() );
 				
 				
 				Function new_function = null;
@@ -155,12 +156,12 @@ public class RuleStoreManagerSqlDAOAdvanced implements RuleStore {
 				}
 				
 				r_ate = new Conjunction(new_function, ate_elements);
-				log.info(new_function.toString());
+			//	log.info(new_function.toString());
 			
 			}
 
 		}
-		log.info(r_ate.toString());
+	//	log.info(r_ate.toString());
 		
 		return r_ate ;
 		
@@ -256,14 +257,14 @@ public class RuleStoreManagerSqlDAOAdvanced implements RuleStore {
 			new_decision =  Decision.UNDECIDABLE;
 		}
 		
-		log.info("neue_regel:");
+		//log.info("neue_regel:");
 
 		return new Rule(new_rule_priority, new_subject, new_action, new_resource, new_decision);
 	
 	}
 	
 	
-	private DBRule mapPolicyLangToInternStructure(AttributeTreeElement p_priority_rule, Subject p_subject, Action p_action,
+	public DBRule mapPolicyLangToInternStructure(AttributeTreeElement p_priority_rule, Subject p_subject, Action p_action,
 	Resource p_resource){
 		
 		
@@ -361,7 +362,7 @@ public class RuleStoreManagerSqlDAOAdvanced implements RuleStore {
 				p_resource );
 		new_dbrule.setDescription("description");
 		new_dbrule.setEffect(p_decision.toString());
-		new_dbrule = new RuleManagerSQL().create(new_dbrule);
+		new_dbrule = new JPAORManager().create(new_dbrule);
 
 		return false;
 	}
@@ -372,7 +373,7 @@ public class RuleStoreManagerSqlDAOAdvanced implements RuleStore {
 		
 		DBRule new_dbrule =  mapPolicyLangToInternStructure(p_root_element, p_subject, p_action,
 				p_resource );
-		new RuleManagerSQL().delete(new_dbrule);
+		new JPAORManager().delete(new_dbrule);
 		
 		return false;
 		
@@ -381,11 +382,15 @@ public class RuleStoreManagerSqlDAOAdvanced implements RuleStore {
 	@Override
 	public List<Rule> find(AttributeTreeElement p_root_element, Subject p_subject, Action p_action,
 			Resource p_resource) {
-	
+		
+		RefmoLogr reflog = new RefmoLogr("Persistence Operation mapInInternalStructure SQL");
+		reflog.start();
+		
 		DBRule new_dbrule =  mapPolicyLangToInternStructure(p_root_element, p_subject, p_action,
 				p_resource );
-	
-		return 	this.mapInternalListToRuleList(new RuleManagerSQL().find(new_dbrule));
+		reflog.stop();
+		
+		return 	this.mapInternalListToRuleList(new JPAORManager().find(new_dbrule));
 		
 	}
 	
@@ -396,8 +401,6 @@ public class RuleStoreManagerSqlDAOAdvanced implements RuleStore {
 		for (DBRule db_rule : db_rules){
 			
 			rules.add(this.mapInternStructureToPolicyLang(db_rule));
-			
-		
 		}
 		
 		return rules;
@@ -407,7 +410,7 @@ public class RuleStoreManagerSqlDAOAdvanced implements RuleStore {
 	@Override
 	public List<Rule> findAll() {
 	
-		return this.mapInternalListToRuleList(new RuleManagerSQL().findAll());
+		return this.mapInternalListToRuleList(new JPAORManager().findAll());
 	}
 
 	@Override
@@ -422,13 +425,19 @@ public class RuleStoreManagerSqlDAOAdvanced implements RuleStore {
 				p_resource_new );
 		
 		
-		new RuleManagerSQL().update(new_dbrule, new_dbrule_update  );
+		new JPAORManager().update(new_dbrule, new_dbrule_update  );
 		
 		return false;
 	}
 
 	public void deleteAll() {
-		new RuleManagerSQL().deleteAll();
+		new JPAORManager().deleteAll();
+		
+	}
+
+	public int count() {
+		return new JPAORManager().count();
+		
 		
 	}
 

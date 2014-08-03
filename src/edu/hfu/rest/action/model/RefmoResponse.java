@@ -49,6 +49,9 @@ public class RefmoResponse {
 	decision = finalDecision;
 		
 	}
+	public RefmoResponse(String string) {
+		warning.add( string);
+	}
 	public Decision getDecision() {
 		return decision;
 		

@@ -1,5 +1,6 @@
 package edu.hfu.refmo.client;
 
+import java.net.SocketTimeoutException;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -11,6 +12,7 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import edu.hfu.rest.action.model.MaintainRequest;
+import edu.hfu.rest.action.model.MaintainRequestBasisTerm;
 import edu.hfu.rest.action.model.RefmoRequest;
 import edu.hfu.rest.action.model.RefmoResponse;
 import edu.hfu.rest.action.model.RequestAttribute;
@@ -55,7 +57,7 @@ public class RequestMaker {
 	public void update(MaintainRequest mr) {
 		   try{
 		WebResource webResource = getClient().resource(URI+URImaintain);
-		ClientResponse response = webResource.type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).post(ClientResponse.class, mr);
+		ClientResponse response = webResource.type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).put(ClientResponse.class, mr);
 		handleResponse(response);
 	        }
 		   catch(Exception e){
@@ -71,7 +73,7 @@ public class RequestMaker {
 	    mr.setEffect("PERMIT");
 	    mr.setDescription("test desc");
 		WebResource webResource = getClient().resource(URI+URImaintain);
-		ClientResponse response = webResource.type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).put(ClientResponse.class, mr);
+		ClientResponse response = webResource.type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).post(ClientResponse.class, mr);
 
 		handleResponse(response);
 		
@@ -236,5 +238,76 @@ public class RequestMaker {
 		
 		return params;
 	}
+
+	public void deleteByURI(MaintainRequest maintainRequest) {
+
+
+   try{
+			   
+			   
+			   MultivaluedMap<String, String> params = new MultivaluedMapImpl();
+			   
+			   params = buildGetParamListMaintain(params,maintainRequest);
+		       // params.add("list", null);
+		        
+				WebResource webResource = getClient().resource(URI+URImaintain+"delete");
+				ClientResponse response = webResource.queryParams(params).type("application/x-www-form-urlencoded").accept(MediaType.APPLICATION_JSON).delete(ClientResponse.class);
+				handleResponse(response);
+			        }
+				   catch(Exception e){
+			        	 // e.printStackTrace();
+				   }
+	
+	}
+
+	private MultivaluedMap<String, String> buildGetParamListMaintain(
+			MultivaluedMap<String, String> params,
+			MaintainRequest mr) {
+	
+	
+			params = getAttributesForURIMaintain(mr.getAction_term(), params, "__a_");
+			params = getAttributesForURIMaintain(mr.getSubject_term(), params, "__s_");
+			params = getAttributesForURIMaintain(mr.getResource_term(), params, "__o_");
+			params = getAttributesForURIMaintain(mr.getRule_term(), params, "__r_");
+	
+			return params;
+	}
+
+	private MultivaluedMap<String, String> getAttributesForURIMaintain(
+			MaintainRequestBasisTerm root_term,
+			MultivaluedMap<String, String> params, String suffix) {
+	
+		if(root_term != null){
+			
+			
+			if(root_term.getType().equals("CONDITION")){
+				
+				
+				 if(root_term.getName() != null && root_term.getName()!=""){
+					  
+					  params.add(suffix+root_term.getName(), root_term.getValue());
+					  
+				  }
+				 
+			}
+			
+			if(root_term.getType().equals("CONJUNCTION")){
+				
+				
+				for (MaintainRequestBasisTerm i_bterm : root_term.getSubTerms()) {
+					
+					params = getAttributesForURIMaintain(i_bterm, params, suffix);
+					
+				}
+				
+			}
+
+		}
+		
+		
+		return params;
+	}
+			
+
 
 }

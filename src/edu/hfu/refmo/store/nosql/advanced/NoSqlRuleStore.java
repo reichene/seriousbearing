@@ -15,18 +15,26 @@ import de.abacs.base.entity.Resource;
 import de.abacs.base.entity.Rule;
 import de.abacs.base.entity.Subject;
 import de.abacs.base.store.RuleStore;
+import edu.hfu.refmo.logger.RefmoLogr;
 
-public class RuleStoreManagerGDatastore implements RuleStore {
+public class NoSqlRuleStore implements RuleStore {
 
-	private static final Logger log = Logger.getLogger(RuleStoreManagerGDatastore.class
+	private static final Logger log = Logger.getLogger(NoSqlRuleStore.class
 			.getName());
 	@Override
 	public boolean create(AttributeTreeElement ruleRootElement,
 			Subject subject, Action action, Resource resource, Decision decision) {
 		
-		GDSRule new_gdsrule = new RuleStoreManagerNoSql().create(ruleRootElement, subject, action, resource, decision);
 		
-		log.info(new_gdsrule.toString());
+		RefmoLogr reflog = new RefmoLogr("RuleStoreManager create Rule");
+		reflog.start();
+		
+		GDSRule new_gdsrule = new DatastoreManager().create(ruleRootElement, subject, action, resource, decision);
+		
+		
+		
+		reflog.stop();
+	//	log.info(new_gdsrule.toString());
 		
 		
 		return false;
@@ -38,10 +46,14 @@ public class RuleStoreManagerGDatastore implements RuleStore {
 			AttributeTreeElement newRuleRootElement, Subject newSubject,
 			Action newAction, Resource newResource) {
 
-		RuleStoreManagerNoSql rsmns = new RuleStoreManagerNoSql();
+		DatastoreManager rsmns = new DatastoreManager();
+	
+		RefmoLogr reflog = new RefmoLogr("RuleStoreManager update Rule");
+		reflog.start();
+	
 		rsmns.update(newRuleRootElement, newSubject, newAction, newResource, rsmns.find(ruleRootElement, subject, action, resource));
 		
-		
+		reflog.stop();
 		return false;
 	}
 
@@ -53,8 +65,14 @@ public class RuleStoreManagerGDatastore implements RuleStore {
 //		rsmns.deleteByObject(rsmns.find(ruleRootElement, subject, action, resource));
 //		
 //		
-		RuleStoreManagerNoSql rsmns = new RuleStoreManagerNoSql();
+		DatastoreManager rsmns = new DatastoreManager();
+		
+		RefmoLogr reflog = new RefmoLogr("RuleStoreManager delete Rule");
+		reflog.start();
+		
 		rsmns.deleteByKey(rsmns.findRuleKeys(ruleRootElement, subject, action, resource));
+	
+		reflog.start();
 		
 		return false;
 	}
@@ -62,17 +80,20 @@ public class RuleStoreManagerGDatastore implements RuleStore {
 	@Override
 	public List<Rule> findAll() {
 		
-		List<Rule> zack= parseGDSToPolicLang(new RuleStoreManagerNoSql().findAll());
+		List<Rule> zack= parseGDSToPolicLang(new DatastoreManager().findAll());
 		return zack;
 	}
 
 	@Override
 	public List<Rule> find(AttributeTreeElement ruleRootElement,
 			Subject subject, Action action, Resource resource) {
-		return parseGDSToPolicLang(new RuleStoreManagerNoSql().find(ruleRootElement, subject, action, resource));
+		return parseGDSToPolicLang(new DatastoreManager().find(ruleRootElement, subject, action, resource));
 	}
 	
-	private List<Rule> parseGDSToPolicLang(List<GDSRule> all_gdsrules) {
+	public List<Rule> parseGDSToPolicLang(List<GDSRule> all_gdsrules) {
+		
+		RefmoLogr reflog = new RefmoLogr("RuleStoreManager find Rule");
+		reflog.start();
 		
 		List<Rule> par_list = new ArrayList<Rule>();
 
@@ -81,11 +102,12 @@ public class RuleStoreManagerGDatastore implements RuleStore {
 			par_list.add(parseGDSRuleToRule(gdsRule));
 		}
 		
+		reflog.stop();
 		return par_list;
 		
 	}
 	
-	private Rule parseGDSRuleToRule(GDSRule p_gds_rule){
+	public Rule parseGDSRuleToRule(GDSRule p_gds_rule){
 		
 		
 	if(p_gds_rule != null){
@@ -149,7 +171,7 @@ public class RuleStoreManagerGDatastore implements RuleStore {
 	
 	}
 
-	private AttributeTreeElement mapGDSTermToAttributeTreeElement(
+	public AttributeTreeElement mapGDSTermToAttributeTreeElement(
 			GDSTerm gdst) {
 		
 		AttributeTreeElement rate = null;
@@ -239,7 +261,13 @@ public class RuleStoreManagerGDatastore implements RuleStore {
 
 	public void deleteAll() {
 		
-		new RuleStoreManagerNoSql().deleteAll();
+		new DatastoreManager().deleteAll();
+		
+	}
+
+	public int count() {
+		return new DatastoreManager().count();
+	
 		
 	}
 }

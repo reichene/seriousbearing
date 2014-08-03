@@ -2,14 +2,21 @@ package edu.hfu.refmo.store.sql.manager;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import org.mortbay.log.Log;
+
 import com.google.appengine.api.utils.SystemProperty;
 
-public class EMFSingleton {
+import edu.hfu.refmo.store.sql.model.advanced.JPAORManager;
 
+public class EMFSingleton {
+	
+	private static final Logger log = Logger.getLogger(EMFSingleton.class
+			.getName());
 
 	    private static EntityManagerFactory instance = null;
 	 
@@ -20,7 +27,7 @@ public class EMFSingleton {
 	        if (instance == null) {
 	        	
 	     
-	       
+	        	EntityManagerFactory emf = null;
 	        	 Map<String, String> properties = new HashMap<String, String>();
 	        	    if (SystemProperty.environment.value() ==
 	        	          SystemProperty.Environment.Value.Production) {
@@ -28,19 +35,26 @@ public class EMFSingleton {
 	        	properties.put("javax.persistence.jdbc.user", System.getProperty("cloudsql.user"));
 	        //	properties.put("javax.persistence.jdbc.password", System.getProperty("cloudsql.password"));
 	        	properties.put("javax.persistence.jdbc.url", System.getProperty("cloudsql.url")+System.getProperty("cloudsql.database"));
+	        	
+	        	emf = Persistence.createEntityManagerFactory(
+	        	        "JPAReferenceMonitorAdva", properties);
+	        	
+	        	
 	        	    } else {
-	        	properties.put("javax.persistence.jdbc.driver","com.mysql.jdbc.Driver");
-	        	properties.put("javax.persistence.jdbc.user", System.getProperty("cloudsql.user.dev"));
-	        	properties.put("javax.persistence.jdbc.password", System.getProperty("cloudsql.password.dev"));
-	        	properties.put("javax.persistence.jdbc.url", System.getProperty("cloudsql.url.dev")+System.getProperty("cloudsql.database.dev"));
+//	        	properties.put("javax.persistence.jdbc.driver","com.mysql.jdbc.Driver");
+//	        	properties.put("javax.persistence.jdbc.user", System.getProperty("cloudsql.user.dev"));
+//	        	properties.put("javax.persistence.jdbc.password", System.getProperty("cloudsql.password.dev"));
+//	        	properties.put("javax.persistence.jdbc.url", System.getProperty("cloudsql.url.dev")+System.getProperty("cloudsql.database.dev"));
+	        	  
+	        	emf = Persistence.createEntityManagerFactory("JPAReferenceMonitorAdva");
+	        	    
 	        	    }
 
-	        	EntityManagerFactory emf = Persistence.createEntityManagerFactory(
-	        	        "JPAReferenceMonitorAdva", properties);
+	        
 
-	        	    // Insert a few rows.
+	        	
 	        	    instance = emf;
-
+	        	    log.info("new entity manager instance");
 	        	
 	        }
 	        return instance;

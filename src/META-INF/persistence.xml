@@ -7,9 +7,12 @@
             <property name="datanucleus.NontransactionalRead" value="true"/>
             <property name="datanucleus.NontransactionalWrite" value="true"/>
             <property name="datanucleus.ConnectionURL" value="appengine"/>
+            <property name="datanucleus.storeManagerType" value="rdbms"/>
         </properties>
+        
+        
     </persistence-unit>
-    
+
    <persistence-unit name="JPAReferenceMonitor_Tree">
       <class>edu.hfu.refmo.store.sql.model.Function</class>
       <class>edu.hfu.refmo.store.sql.model.Match</class>
@@ -58,9 +61,25 @@
     <exclude-unlisted-classes/>
 
     <properties>
-              <property name="datanucleus.autoCreateSchema" value="false"/>
+        
+           	<!-- 
+           	   	properties.put("javax.persistence.jdbc.driver","com.mysql.jdbc.Driver");
+	        	properties.put("javax.persistence.jdbc.user", System.getProperty("cloudsql.user.dev"));
+	        	properties.put("javax.persistence.jdbc.password", System.getProperty("cloudsql.password.dev"));
+	        	properties.put("javax.persistence.jdbc.url", System.getProperty("cloudsql.url.dev")+System.getProperty("cloudsql.database.dev")); -->
+           	
+           	<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+           	<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/rulestore_advanced"/>
+
+    		<property name="javax.persistence.jdbc.user" value="root"/>
+    		<property name="javax.persistence.jdbc.password" value="admin"/>
+            <property name="datanucleus.autoCreateSchema" value="false"/>
             <property name="datanucleus.validateTables" value="false"/>
             <property name="datanucleus.validateConstraints" value="false"/>
+            <property name="datanucleus.storeManagerType" value="rdbms"/>
+            
+
+        
 
     </properties>
 

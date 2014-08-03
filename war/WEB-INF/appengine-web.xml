@@ -5,15 +5,18 @@
   <sessions-enabled>true</sessions-enabled>
    <use-google-connector-j>true</use-google-connector-j>
   <threadsafe>true</threadsafe>
-  <version>5</version>
+  <version>7</version>
 
   <!--
     Allows App Engine to send multiple requests to one instance in parallel:
   -->
 
+        
+
   <!-- Configure java.util.logging -->
   <system-properties>
     <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
+    <property name="appengine.datastore.disableChunkSizeWarning" value="true"></property>
          <property name="cloudsql.url" value="jdbc:google:mysql://serious-bearing-580:airport420/"/>
     <property name="cloudsql.database" value="rulestore"/>
     <property name="cloudsql.user" value="root"/>

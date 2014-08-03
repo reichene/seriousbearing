@@ -4,7 +4,7 @@ import de.abacs.base.entity.AttributeTreeElement;
 import de.abacs.base.entity.Decision;
 import de.abacs.base.query.Query;
 
-public interface QueryManager {
+public interface QueryInterface {
 	
 	Query read(AttributeTreeElement ruleAttributes, AttributeTreeElement subjectAttributes, AttributeTreeElement actionAttributes,
             AttributeTreeElement resourceAttributes);

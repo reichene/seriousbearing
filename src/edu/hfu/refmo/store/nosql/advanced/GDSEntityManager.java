@@ -13,7 +13,9 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.PropertyProjection;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.CompositeFilter;
 import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
@@ -21,6 +23,7 @@ import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 
+import edu.hfu.refmo.logger.RefmoLogr;
 import edu.hfu.refmo.store.nosql.advanced.GDSRule.DSElements;
 import edu.hfu.refmo.store.nosql.advanced.GDSRule.RulePara;
 import edu.hfu.refmo.store.nosql.advanced.GDSTerm.TermPara;
@@ -36,6 +39,11 @@ public class GDSEntityManager {
 		List<GDSRule> r_rule_list = new ArrayList<GDSRule>();
 
 		try {
+			
+			RefmoLogr reflog = new RefmoLogr("Persistence Operation Find All NoSQL");
+			reflog.start();
+			
+			
 			DatastoreService datastore = DatastoreServiceFactory
 					.getDatastoreService();
 
@@ -44,12 +52,14 @@ public class GDSEntityManager {
 			for (Entity result : datastore.prepare(q).asList(
 					FetchOptions.Builder.withDefaults())) {
 
-				log.info("found rule with key: " + result.getKey());
+			//	log.info("found rule with key: " + result.getKey());
 				r_rule_list.add(loadSingleRuleByAncestorKey(result.getKey()));
 
 				// TEST
 				// printCurrentEntity( result);
 
+				
+				reflog.stop();
 			}
 
 		}
@@ -67,15 +77,21 @@ public class GDSEntityManager {
 		GDSRule new_gds_rule = null;
 
 		try {
+			RefmoLogr reflog = new RefmoLogr("3. Datastore Operation FindByKey NoSQL");
+			reflog.start();
+			
+			
 			DatastoreService datastore = DatastoreServiceFactory
 					.getDatastoreService();
-			log.info("start query: find-rule-by-ancestor-key with key: "
-					+ key.getKind() + " " + key.getId());
+		//	log.info("start query: find-rule-by-ancestor-key with key: "
+		//			+ key.getKind() + " " + key.getId());
 			Query q = new Query().setAncestor(key);
 			List<Entity> results = datastore.prepare(q).asList(
 					FetchOptions.Builder.withDefaults());
-
+			
 			new_gds_rule = parseSingleAncestorPathToRule(results);
+			
+			reflog.stop();
 		}
 
 		catch (Exception e) {
@@ -84,6 +100,7 @@ public class GDSEntityManager {
 		}
 
 		return new_gds_rule;
+		
 	}
 
 	private GDSRule parseSingleAncestorPathToRule(List<Entity> results) {
@@ -94,8 +111,8 @@ public class GDSEntityManager {
 
 		for (Entity entity : results) {
 
-			// test
-			this.printCurrentEntity(entity);
+//			// test
+//			this.printCurrentEntity(entity);
 
 			if (entity.getKind().equals(DSElements.RULE.name())) {
 
@@ -315,26 +332,33 @@ public class GDSEntityManager {
 
 		log.info("start query: find with select parameters" + attributeMap.toString());
 		
-		
 		List<GDSRule> rstl = new ArrayList<GDSRule>();
+		
+		RefmoLogr reflog = new RefmoLogr("GETRULESFROMKEYS: Persistence Operation Find NoSQL");
+		reflog.start();
 
 		for (Key rule_key : findRuleKeys(attributeMap)) {
 			if(rule_key != null){
 			rstl.add(this.loadSingleRuleByAncestorKey(rule_key));
 			}
 		}
-		//TEST
+		
+		reflog.stop();
+//		//TEST
 		this.printGDSRule(rstl);
 
+		
+		
 		return rstl;
 	}
 
 	private void printGDSRule(List<GDSRule> rstl) {
 		
-		log.info("RESULT");
+		log.info("ENDRESULT: Found \n" + rstl.size() + " items ");
 
 for (GDSRule gdsRule : rstl) {
 	
+//	this.printCurrentEntity(entity);
 	log.info(gdsRule.toString());
 	
 }
@@ -349,15 +373,21 @@ for (GDSRule gdsRule : rstl) {
 			relevant_rulekeys = this.findAllRules();
 		}
 		
-
+		RefmoLogr reflog1 = new RefmoLogr("KEYSELECTIONTIME: 1.1 Datastore Operation Find NoSQL Keys");
+		reflog1.start();
 		for (String cat_key : attributeMap.keySet()) {
 			
-			log.info("select rule key for category: " + cat_key);
-
+		//log.info("select rule key for category: " + cat_key);
+		
+			RefmoLogr reflog = new RefmoLogr("2. Persistence Operation FindCategory NoSQL");
+			reflog.start();
+			
 			relevant_rulekeys = this.findRuleKeysEachCategory(
 					relevant_rulekeys, attributeMap.get(cat_key), cat_key);
+			
+			reflog.stop();
 		}
-
+		reflog1.stop();
 		return relevant_rulekeys;
 	}
 
@@ -374,7 +404,7 @@ for (GDSRule gdsRule : rstl) {
 			for (Entity result : datastore.prepare(q).asList(
 					FetchOptions.Builder.withDefaults())) {
 
-				log.info("found rule with key: " + result.getKey());
+			//	log.info("found rule with key: " + result.getKey());
 				r_rule_list.add(result.getKey());
 
 				// TEST
@@ -397,32 +427,43 @@ for (GDSRule gdsRule : rstl) {
 
 		/***
 		 * 
-		 * iterate attributes by category
+		 * attributes by category
 		 */
 
 		Set<Key> attribute_keys = new HashSet<>();
-		attribute_keys = relevant_rulekeys;
 		
-		if(attribute_keys != null){
-		log.info("RULES IN LIST"+ attribute_keys.toString());
+		/**
+		 *   no select parameter defined for the  current category 
+		 */
+		if(list.size() != 0){
+		attribute_keys = relevant_rulekeys;
 		}
+		
+	//	if(attribute_keys != null){
+	//	log.info("RULES IN LIST"+ attribute_keys.toString());
+	//	}
 		Set<Key> no_terms_keys = new HashSet<>();
-
+		RefmoLogr reflog1 = new RefmoLogr("2.1 Datastore Operation FindCategoryAttribute NoSQL");
+		reflog1.start();
 		for (List<String> attribute_list : list) {
 			
-			log.info("rule_keys by category and single attribute: "+ attribute_list.toString());
+			//log.info("rule_keys by category and single attribute: "+ attribute_list.toString());
 
 			attribute_keys = getRulesBySingleAttribute(cat_key, attribute_keys,
 					attribute_list);
 
 		}
 
+		reflog1.stop();
 		/**
 		 * get rule keys, where no terms for a given category are existing
 		 */
-		no_terms_keys = getRulesWithoutCategoryTerms(cat_key, relevant_rulekeys);
 		
-		log.info("rules without any terms for the slected category: " + no_terms_keys.toString());
+		RefmoLogr reflog2 = new RefmoLogr("2.2 Datastore Operation FindCategoryNoAttribute NoSQL");
+		reflog2.start();
+		no_terms_keys = getRulesWithoutCategoryTerms(cat_key, relevant_rulekeys);
+		reflog2.stop();
+//		log.info("rules without any terms for the slected category: " + no_terms_keys.toString());
 		
 	
 		
@@ -454,35 +495,52 @@ for (GDSRule gdsRule : rstl) {
 		boolean empty = false;
 
 		if (attribute_list.size() == 3) {
+			
+			// test
+			
+			
+				
+			
 			filters.add(new FilterPredicate(TermPara.NAME.name(),
 					FilterOperator.EQUAL, attribute_list.get(0)));
 			filters.add(new FilterPredicate(TermPara.CATEGORY.name(),
 					FilterOperator.EQUAL, attribute_list.get(1)));
 			filters.add(new FilterPredicate(TermPara.DISCRIMINATOR.name(),
 					FilterOperator.EQUAL, attribute_list.get(2)));
-
+			
 		}
 
 		if (relevant_rulekeys != null) {
 			
 		
-			
 			if(relevant_rulekeys.size() == 0 ){
 				empty = true;
 			}
 			else{
 				
-
+ 	//	IN Operation is very slow, not able to scale
+	//	--------------------------------------------
 				Filter action_filter = new FilterPredicate(
 						TermPara.PARENT_RULE.name(), FilterOperator.IN,
 						relevant_rulekeys);
 				filters.add(action_filter);
+//				
+				// Filter OR Filter OR Filter....
+//				
+//				CompositeFilter cf_keyor= CompositeFilterOperator.or(buildKeyOrFilter(relevant_rulekeys));
+//				filters.add(cf_keyor);
+				
+				
 			}
 		}
 		
 		if(!empty){
 
 		try {
+			
+			RefmoLogr reflog = new RefmoLogr("Datastore Operation FindByFilter NoSQL");
+			reflog.start();
+			
 			DatastoreService datastore = DatastoreServiceFactory
 					.getDatastoreService();
 			
@@ -490,17 +548,24 @@ for (GDSRule gdsRule : rstl) {
 
 			Query endjquery = new Query(DSElements.TERM.name())
 					.setFilter(cf);
-			// endjquery.addProjection(new PropertyProjection("parent_rule",
+//			endjquery.addProjection(new PropertyProjection(TermPara.PARENT_RULE
+//					.name(), com.google.appengine.api.datastore.Key.class));
+//			// endjquery.addProjection(new PropertyProjection("parent_rule",
 			// Key.class));
 			List<Entity> allresultsend = datastore.prepare(endjquery).asList(
 					FetchOptions.Builder.withDefaults());
 			
-			log.info("results for filter" + cf.toString());
+			reflog.stop();
+			
+		//	log.info("results for filter" + cf.toString());
 
+			RefmoLogr reflog2 = new RefmoLogr("merge entity keys NOSQL");
+			reflog2.start();
+			
 			for (Entity entity : allresultsend) {
 
 				// TEST
-				printCurrentEntity(entity);
+		//		printCurrentEntity(entity);
 
 				Key k_rausgabe = (Key) entity.getProperty(TermPara.PARENT_RULE
 						.name());
@@ -512,6 +577,8 @@ for (GDSRule gdsRule : rstl) {
 				}
 
 			}
+			
+			reflog2.stop();
 
 		}
 
@@ -524,23 +591,39 @@ for (GDSRule gdsRule : rstl) {
 		return new_relevant_rulekeys;
 	}
 
+	private List<Filter> buildKeyOrFilter(Set<Key> relevant_rulekeys) {
+		
+		List<Filter> newfilterlist = new ArrayList();
+		for (Key key : relevant_rulekeys) {
+			
+		
+			newfilterlist.add(new FilterPredicate(TermPara.PARENT_RULE.name(), FilterOperator.EQUAL,key));			
+			
+			
+		}
+		
+		
+		return newfilterlist;
+	}
+
 	private void printCurrentEntity(Entity entity) {
 
-		log.info("ENTITY-KEY: " + entity.getKey());
-		log.info("ENTITY-KIND: " + entity.getKind());
-		log.info("ENTITY-PARENT-KEY: " + entity.getParent());
+		log.info("ENTITY-KEY: " + entity.getKey() + " ENTITY-KIND: " + entity.getKind() + " ENTITY-PARENT-KEY: " + entity.getParent());
 
 		// properties ;)
-		log.info("properties ---");
+	
+		
+		String logst = "";
 
 		for (int i = 0; i < entity.getProperties().keySet().size(); i++) {
 
-			log.info(entity.getProperties().keySet().toArray()[i]
+			logst += (entity.getProperties().keySet().toArray()[i]
 					+ " : "
 					+ entity.getProperties().get(
-							entity.getProperties().keySet().toArray()[i]));
+							entity.getProperties().keySet().toArray()[i])) + "\n";
 
 		}
+		log.info("ENTITY properties --- \n" + logst);
 	}
 
 	private Set<Key> getRulesWithoutCategoryTerms(String cat_key,
@@ -572,7 +655,7 @@ for (GDSRule gdsRule : rstl) {
 
 				Key key_category = (Key) entity.getProperty(cat_key);
 				
-				log.info("rule keys without a term in category "+ cat_key);
+			//	log.info("rule keys without a term in category "+ cat_key);
 
 				/***
 				 * ALTERNATIVE: Filter Key Query q = new Query("Person")
@@ -585,8 +668,8 @@ for (GDSRule gdsRule : rstl) {
 
 				
 					selected_rulekeys.add(entity.getKey());
-					log.info("rule  without a term in category "+ cat_key);
-					this.printCurrentEntity(entity);
+				//	log.info("rule  without a term in category "+ cat_key);
+					//this.printCurrentEntity(entity);
 
 				}
 
@@ -599,9 +682,9 @@ for (GDSRule gdsRule : rstl) {
 
 			else {
 				
-				log.info("merge both list: ");
-				log.info(relevant_rulekeys.toString());
-				log.info(selected_rulekeys.toString());
+//				log.info("merge both list: ");
+//				log.info(relevant_rulekeys.toString());
+//				log.info(selected_rulekeys.toString());
 
 				for (Key key : selected_rulekeys) {
 
@@ -822,7 +905,10 @@ for (GDSRule gdsRule : rstl) {
 	private Entity setRuleEntityProperties(Entity rule_entity, GDSRule gds_rule) {
 
 		if (rule_entity == null) {
-			rule_entity = new Entity(DSElements.RULE.name());
+			
+			
+			Key ruleStoreKey = KeyFactory.createKey("RULESTORE", "FUFUQ");
+			rule_entity = new Entity(DSElements.RULE.name(), ruleStoreKey );
 
 		}
 
@@ -958,13 +1044,13 @@ for (GDSRule gdsRule : rstl) {
 
 			for (Key key : list) {
 
-				log.info("delete by key: select child-terms for rule with key: " +  key.toString());
+		//		log.info("delete by key: select child-terms for rule with key: " +  key.toString());
 				Query q = new Query().setAncestor(key);
 				List<Entity> results = datastore.prepare(q).asList(
 						FetchOptions.Builder.withDefaults());
 				results_all.addAll(results);
 				
-				log.info("child terms for rule: " + results.toString());
+			//	log.info("child terms for rule: " + results.toString());
 				
 				
 
@@ -975,7 +1061,7 @@ for (GDSRule gdsRule : rstl) {
 				list_keys.add(entity.getKey());
 				
 			}
-			log.info("delete by key: child-terms with keys: " + list_keys.toString());
+	//		log.info("delete by key: child-terms with keys: " + list_keys.toString());
 			deleteByRuleKey(list_keys);
 			
 		} catch (Exception e) {
@@ -1043,6 +1129,104 @@ for (GDSRule gdsRule : rstl) {
 
 			e.printStackTrace();
 		}
+	}
+
+	public int count() {
+		
+		int sum = 0;
+		try {
+			DatastoreService datastore = DatastoreServiceFactory
+					.getDatastoreService();
+
+			Query q =  new Query("RULE").setKeysOnly();
+			
+			List<Entity> results = datastore.prepare(q).asList(
+					FetchOptions.Builder.withDefaults());
+			
+			sum = results.size();
+			
+	
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+		return sum;
+		
+	}
+
+	public List<GDSRule> find(Filter combinationFilter) {
+		log.info("start query: find with select parameters" +  combinationFilter.toString());
+		
+		List<GDSRule> rstl = new ArrayList<GDSRule>();
+		
+		RefmoLogr reflog = new RefmoLogr("GETRULESFROMKEYS: Persistence Operation Find NoSQL");
+		reflog.start();
+
+		for (Key rule_key : findRuleKeys(combinationFilter)) {
+			if(rule_key != null){
+			rstl.add(this.loadSingleRuleByAncestorKey(rule_key));
+			}
+		}
+		
+		reflog.stop();
+//		//TEST
+		this.printGDSRule(rstl);
+
+		
+		
+		return rstl;
+		
+	}
+
+	private Set<Key> findRuleKeys(Filter combinationFilter) {
+		
+		Set<Key> new_relevant_rulekeys = new HashSet<>();
+
+	
+
+		try {
+			
+
+			
+			DatastoreService datastore = DatastoreServiceFactory
+					.getDatastoreService();
+			
+
+			Query endjquery = new Query(TermKey.TERMKEY.name()).setFilter(combinationFilter);
+		//	endjquery.addProjection(new PropertyProjection(TermKey.RULEKEY.name(), com.google.appengine.api.datastore.Key.class));
+
+			
+			RefmoLogr reflog1 = new RefmoLogr("KEYSELECTIONTIME: 1.1 Datastore Operation Find NoSQL Keys");
+			reflog1.start();
+			List<Entity> allresultsend = datastore.prepare(endjquery).asList(
+					FetchOptions.Builder.withDefaults());
+			
+			reflog1.stop();
+			
+			
+			for (Entity key : allresultsend) {
+				
+				
+				new_relevant_rulekeys.add((Key) key.getProperty(TermKey.RULEKEY.name()));
+				
+			}
+	
+
+		}
+
+		catch (Exception e) {
+
+			e.printStackTrace();
+		}
+		
+
+	
+		
+		
+
+		return new_relevant_rulekeys ;
+		
+		
 	}
 
 }

@@ -28,15 +28,15 @@ public class MaintainRequest {
 	String effect;
 	String description;
 	
-	MaintainRequestBasisTerm subject_term;
-	MaintainRequestBasisTerm resource_term;
-	MaintainRequestBasisTerm action_term;
-	MaintainRequestBasisTerm rule_term;
+	private MaintainRequestBasisTerm subject_term;
+	private MaintainRequestBasisTerm resource_term;
+	private MaintainRequestBasisTerm action_term;
+	private MaintainRequestBasisTerm rule_term;
 
-	MaintainRequestBasisTerm new_subject_term;
-	MaintainRequestBasisTerm new_resource_term;
-	MaintainRequestBasisTerm new_action_term;
-	MaintainRequestBasisTerm new_rule_term;
+	private  MaintainRequestBasisTerm new_subject_term;
+	private MaintainRequestBasisTerm new_resource_term;
+	private MaintainRequestBasisTerm new_action_term;
+	private MaintainRequestBasisTerm new_rule_term;
 	
 	
 	public String getEffect() {
@@ -211,10 +211,12 @@ public class MaintainRequest {
 		if(rule_term !=null){
 			
 		//	if(rule_term instanceof MaintainRequestConditionTerm)	{
+
+			if(rule_term.getType() != null){
 			if(rule_term.getType().equals("CONDITION"))	{
 				
 				Comparision new_comp = null;
-				
+				if(rule_term.getComparision() !=null){
 				switch (rule_term.getComparision()) {
 				case "EQUAL":
 					new_comp = Comparision.EQUAL;
@@ -228,6 +230,11 @@ public class MaintainRequest {
 				default:
 					new_comp = Comparision.EQUAL;
 					break;
+				}
+				}
+				else  {
+					new_comp = Comparision.EQUAL;
+					
 				}
 				
 				r_ate= new Condition(rule_term.getName(), new_comp, rule_term.getValue());
@@ -265,7 +272,7 @@ public class MaintainRequest {
 				}
 				
 				r_ate = new Conjunction(new_function, ate_elements);
-			}
+			}}
 
 		}
 		

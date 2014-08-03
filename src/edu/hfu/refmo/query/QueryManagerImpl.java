@@ -8,7 +8,7 @@ import de.abacs.base.query.Query;
 import de.abacs.base.query.Read;
 import de.abacs.base.query.Update;
 
-public class QueryManagerImpl implements QueryManager {
+public class QueryManagerImpl implements QueryInterface {
 
 	@Override
 	public Query read(AttributeTreeElement ruleAttributes,

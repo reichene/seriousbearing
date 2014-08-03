@@ -1,15 +1,15 @@
 package edu.hfu.refmo.store.factory;
 
 import de.abacs.base.store.RuleStore;
-import edu.hfu.refmo.store.nosql.advanced.RuleStoreManagerGDatastore;
-import edu.hfu.refmo.store.sql.model.advanced.RuleStoreManagerSqlDAOAdvanced;
+import edu.hfu.refmo.store.nosql.advanced.NoSqlRuleStore;
+import edu.hfu.refmo.store.sql.model.advanced.SqlRuleStore;
 
 public class RuleStoreManagerFactory {
 
 	
     public static RuleStore getRuleStoreManagerClass() { 
-    	RuleStore rs = new RuleStoreManagerSqlDAOAdvanced(); 
-    //     RuleStore rs = new RuleStoreManagerGDatastore();
+  //    RuleStore rs = new SqlRuleStore(); 
+    RuleStore rs = new NoSqlRuleStore();
         return rs; 
     } 
 }

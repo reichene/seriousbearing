@@ -13,6 +13,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 import de.abacs.base.entity.Rule;
 import edu.hfu.refmo.processor.ProcessorManager;
 import edu.hfu.refmo.query.QueryManagerImpl;
@@ -22,7 +24,7 @@ import edu.hfu.rest.action.model.RefmoResponse;
 import edu.hfu.rest.action.model.RequestAttribute;
 
 @Path("/request")
-public class RequestManager {
+public class RequestController {
 
 	/**
 	 *  keep in mind: processor currently supports only equal conditions 
@@ -31,7 +33,7 @@ public class RequestManager {
 	 */
 	
 	
-	private static final Logger log = Logger.getLogger(RequestManager.class
+	private static final Logger log = Logger.getLogger(RequestController.class
 			.getName());
 
 	@Path("/mime")
@@ -78,7 +80,7 @@ public class RequestManager {
 		RefmoResponse rr = new RefmoResponse();
 
 		try {
-			RefmoRequest refre = RequestManager.parseURI(info);
+			RefmoRequest refre = RequestController.parseURI(info);
 			Rule new_rule = refre.getRule();
 			rr = ProcessorManager.process(new QueryManagerImpl().read(
 					new_rule.getRootElement(),
@@ -91,7 +93,9 @@ public class RequestManager {
 		catch (Exception e) {
 
 			
-			rr = new RefmoResponse(e.getStackTrace(), e.getMessage(), e.getLocalizedMessage(), e.toString(), e.getCause().toString());
+			rr = new RefmoResponse(e.getMessage());
+			log.warning(e.getMessage());
+			
 			e.printStackTrace();
 		}
 		return rr;
@@ -113,6 +117,7 @@ public class RequestManager {
 		return null;
 	}
 	
+	//@JsonIgnore
 	private static RefmoRequest parseURI(UriInfo info) {
 		RefmoRequest refre = new RefmoRequest();
 

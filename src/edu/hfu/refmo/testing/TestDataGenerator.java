@@ -46,59 +46,59 @@ public class TestDataGenerator {
 	private void initAAction() {
 
 	random_Attributes_Action.add("a1");
-	random_Attributes_Action.add("a2");
-	random_Attributes_Action.add("a3");
-	random_Attributes_Action.add("a4");
-	random_Attributes_Action.add("a5");
-	random_Attributes_Action.add("a6");
-	random_Attributes_Action.add("a7");
-	random_Attributes_Action.add("a8");
-	random_Attributes_Action.add("a9");
+	random_Attributes_Action.add("a20");
+	random_Attributes_Action.add("a30");
+	random_Attributes_Action.add("a40");
+	random_Attributes_Action.add("a50");
+	random_Attributes_Action.add("a60");
+	random_Attributes_Action.add("a70");
+	random_Attributes_Action.add("a80");
+	random_Attributes_Action.add("a90");
 		
 	}
 
 
 	private void initAObject() {
 		
-		random_Attributes_Object.add("r1");
-		random_Attributes_Object.add("r2");
-		random_Attributes_Object.add("r3");
-		random_Attributes_Object.add("r4");
-		random_Attributes_Object.add("r5");
-		random_Attributes_Object.add("r6");
-		random_Attributes_Object.add("r7");
-		random_Attributes_Object.add("r8");
-		random_Attributes_Object.add("r9");
+		random_Attributes_Object.add("r10");
+		random_Attributes_Object.add("r20");
+		random_Attributes_Object.add("r30");
+		random_Attributes_Object.add("r40");
+		random_Attributes_Object.add("r50");
+		random_Attributes_Object.add("r60");
+		random_Attributes_Object.add("r70");
+		random_Attributes_Object.add("r80");
+		random_Attributes_Object.add("r90");
 		
 	}
 
 
 	private void initASubject() {
 
-	random_Attributes_Subject.add("s1");
-	random_Attributes_Subject.add("s2");
-	random_Attributes_Subject.add("s3");
-	random_Attributes_Subject.add("s4");
-	random_Attributes_Subject.add("s5");
-	random_Attributes_Subject.add("s6");
-	random_Attributes_Subject.add("s7");
-	random_Attributes_Subject.add("s8");
-	random_Attributes_Subject.add("s9");
+	random_Attributes_Subject.add("s10");
+	random_Attributes_Subject.add("s20");
+	random_Attributes_Subject.add("s30");
+	random_Attributes_Subject.add("s40");
+	random_Attributes_Subject.add("s50");
+	random_Attributes_Subject.add("s60");
+	random_Attributes_Subject.add("s70");
+	random_Attributes_Subject.add("s80");
+	random_Attributes_Subject.add("s90");
 
 		
 	}
 
 
 	private void initARule() {
-      random_Attributes_Rule.add("rp1");
-      random_Attributes_Rule.add("rp2");
-      random_Attributes_Rule.add("rp3");
-      random_Attributes_Rule.add("rp4");
-      random_Attributes_Rule.add("rp5");
-      random_Attributes_Rule.add("rp6");
-      random_Attributes_Rule.add("rp7");
-      random_Attributes_Rule.add("rp8");
-      random_Attributes_Rule.add("rp9");
+      random_Attributes_Rule.add("rp10");
+      random_Attributes_Rule.add("rp20");
+      random_Attributes_Rule.add("rp30");
+      random_Attributes_Rule.add("rp40");
+      random_Attributes_Rule.add("rp50");
+      random_Attributes_Rule.add("rp60");
+      random_Attributes_Rule.add("rp70");
+      random_Attributes_Rule.add("rp80");
+      random_Attributes_Rule.add("rp90");
      
 	}
 	
@@ -281,24 +281,24 @@ public class TestDataGenerator {
 		 */
 		
 		System.out.println("- Subject: ");
-		
-		MaintainRequestBasisTerm mrct = new MaintainRequestBasisTerm();
-		mrct.setFunction("OR");
-		mrct.setSubTerm(generateRandomMainReqCondTerm(this.random_Attributes_Subject));
-		mrct.setSubTerm(generateRandomMainReqCondTerm(this.random_Attributes_Subject));
-		mrct.setSubTerm(generateRandomMainReqCondTerm(this.random_Attributes_Subject));
-		mrct.setSubTerm(generateRandomMainReqCondTerm(this.random_Attributes_Subject));
-		mrct.setSubTerm(generateRandomMainReqCondTerm(this.random_Attributes_Subject));
-		
-		MaintainRequestBasisTerm mrct2 = new MaintainRequestBasisTerm();
-		mrct2.setFunction("AND");
-		mrct2.setSubTerm(generateRandomMainReqCondTerm(this.random_Attributes_Subject));
-		mrct2.setSubTerm(generateRandomMainReqCondTerm(this.random_Attributes_Subject));
-		mrct2.setSubTerm(generateRandomMainReqCondTerm(this.random_Attributes_Subject));
-		mrct2.setSubTerm(generateRandomMainReqCondTerm(this.random_Attributes_Subject));
-		mrct2.setSubTerm(mrct);
-		
-		mr.setSubject_term(mrct2);
+//		
+//		MaintainRequestBasisTerm mrct = new MaintainRequestBasisTerm();
+//		mrct.setFunction("OR");
+//		mrct.setSubTerm(generateRandomMainReqCondTerm(this.random_Attributes_Subject));
+//		mrct.setSubTerm(generateRandomMainReqCondTerm(this.random_Attributes_Subject));
+//		mrct.setSubTerm(generateRandomMainReqCondTerm(this.random_Attributes_Subject));
+//		mrct.setSubTerm(generateRandomMainReqCondTerm(this.random_Attributes_Subject));
+//		mrct.setSubTerm(generateRandomMainReqCondTerm(this.random_Attributes_Subject));
+//		
+//		MaintainRequestBasisTerm mrct2 = new MaintainRequestBasisTerm();
+//		mrct2.setFunction("AND");
+//		mrct2.setSubTerm(generateRandomMainReqCondTerm(this.random_Attributes_Subject));
+//		mrct2.setSubTerm(generateRandomMainReqCondTerm(this.random_Attributes_Subject));
+//		mrct2.setSubTerm(generateRandomMainReqCondTerm(this.random_Attributes_Subject));
+//		mrct2.setSubTerm(generateRandomMainReqCondTerm(this.random_Attributes_Subject));
+//		mrct2.setSubTerm(mrct);
+//		
+		mr.setSubject_term(generateRandomMainReqCondTerm(this.random_Attributes_Subject));
 		
 		
 		System.out.println("- new Action: ");
@@ -318,16 +318,17 @@ public class TestDataGenerator {
 	public MaintainRequestBasisTerm generateRandomMainReqCondTerm(List<String> random_Attributes){
 		MaintainRequestBasisTerm mrct = null;
 		
-		if(randomNumber(0,1)>0){
+		//if(randomNumber(0,50)>20){
 			
 		mrct = new MaintainRequestBasisTerm();
 		mrct.setName(random_Attributes.get(randomNumber(0,random_Attributes.size()-1)));
 		mrct.setValue("value is not relevant");
+		mrct.setType("CONDITION");
 		mrct.setComparision("EQUAL");
 		
 		System.out.println("MaintainRequestConditionTerm: " + mrct.getName() + " Comparision: "+ mrct.getComparision());
 		
-		}
+		//}
 		
 		return mrct;		
 		
