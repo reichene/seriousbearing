@@ -31,15 +31,16 @@ public class EMFSingleton {
 	        	 Map<String, String> properties = new HashMap<String, String>();
 	        	    if (SystemProperty.environment.value() ==
 	        	          SystemProperty.Environment.Value.Production) {
-	        	properties.put("javax.persistence.jdbc.driver", "com.mysql.jdbc.GoogleDriver");
-	        	properties.put("javax.persistence.jdbc.user", System.getProperty("cloudsql.user"));
-	        //	properties.put("javax.persistence.jdbc.password", System.getProperty("cloudsql.password"));
-	        	properties.put("javax.persistence.jdbc.url", System.getProperty("cloudsql.url")+System.getProperty("cloudsql.database"));
+//	        	properties.put("javax.persistence.jdbc.driver", "com.mysql.jdbc.GoogleDriver");
+//	        //	properties.put("javax.persistence.jdbc.user", System.getProperty("cloudsql.user"));
+//	        //	properties.put("javax.persistence.jdbc.password", System.getProperty("cloudsql.password"));
+//	        	properties.put("javax.persistence.jdbc.url", System.getProperty("cloudsql.url")+System.getProperty("cloudsql.database")+"?user="+ System.getProperty("cloudsql.user"));
+//	        	
+//	        	emf = Persistence.createEntityManagerFactory(
+//	        	        "JPAReferenceMonitorAdva", properties);
+	    	        	
 	        	
-	        	emf = Persistence.createEntityManagerFactory(
-	        	        "JPAReferenceMonitorAdva", properties);
-	        	
-	        	
+	        	emf = Persistence.createEntityManagerFactory("JPAReferenceMonitorAdvaProduct");
 	        	    } else {
 //	        	properties.put("javax.persistence.jdbc.driver","com.mysql.jdbc.Driver");
 //	        	properties.put("javax.persistence.jdbc.user", System.getProperty("cloudsql.user.dev"));

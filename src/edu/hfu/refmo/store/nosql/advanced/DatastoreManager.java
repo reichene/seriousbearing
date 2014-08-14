@@ -33,7 +33,7 @@ public class DatastoreManager {
 		
 		
 		
-		new GDSSelectionOptimizer().createOptimizationKeys(new_gdsrule.getRule_key(), ruleRootElement,	subject, action, resource);
+	//	new GDSSelectionOptimizer().createOptimizationKeys(new_gdsrule.getRule_key(), ruleRootElement,	subject, action, resource);
 		
 		
 		return new_gdsrule;
@@ -203,10 +203,10 @@ public class DatastoreManager {
 
 		
 		// select 1
-				 new GDSEntityManager().find(attributeMap);
+    return new GDSEntityManager().find(attributeMap);
 		
 		// select2
-	return new GDSEntityManager().find(new GDSSelectionOptimizer().getCombinationFilter(ruleRootElement,	subject, action, resource));
+//	return new GDSEntityManager().find(new GDSSelectionOptimizer().getCombinationFilter(ruleRootElement,	subject, action, resource));
 		
 		
 	}

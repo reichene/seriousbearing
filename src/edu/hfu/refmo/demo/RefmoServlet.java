@@ -9,6 +9,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.ThreadManager;
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 
@@ -26,11 +32,15 @@ import edu.hfu.refmo.client.Conjunction;
 import edu.hfu.refmo.client.ReferenceMonitor;
 import edu.hfu.refmo.client.RulePriority;
 import edu.hfu.refmo.client.Conjunction.Function;
+import edu.hfu.refmo.helper.RuleStoreHelper;
 import edu.hfu.refmo.logger.RefmoLogr;
 import edu.hfu.refmo.processor.ProcessorManager;
 import edu.hfu.refmo.query.QueryManagerImpl;
 import edu.hfu.refmo.store.nosql.advanced.NoSqlRuleStore;
+import edu.hfu.refmo.store.nosql.simple.NoSqlRuleStoreSimple;
+import edu.hfu.refmo.store.nosql.simple.SimpleNoSQLManager;
 import edu.hfu.refmo.store.sql.model.advanced.SqlRuleStore;
+import edu.hfu.refmo.store.sql.simple.SimpleSqlRuleStore;
 import edu.hfu.refmo.testing.TestDataGenerator;
 import edu.hfu.rest.action.jersey.RequestController;
 import edu.hfu.rest.action.model.RefmoResponse;
@@ -564,6 +574,49 @@ public class RefmoServlet extends HttpServlet {
 //				resp.getWriter().println("Hello, world - Demo application  finished successfully");
 			 
 		
+		
+
+		SimpleNoSQLManager sss = new SimpleNoSQLManager();
+		
+		Rule rulefuck = new Rule(
+				new Condition("rp2", Comparision.EQUAL, "value"),
+				new Subject(new Condition("s2", Comparision.EQUAL,"value")),
+				new Action(new Condition("a2", Comparision.EQUAL,"value")),
+				new Resource(new Condition("r2", Comparision.EQUAL,"value")),
+				Decision.PERMIT);
+		
+		
+		String create = sss.mapRuleObjToString(rulefuck);
+		Rule objne = sss.mapCreaRuleStrToObject(create);
+		
+		/***
+		 * 
+		 * 
+		 * 
+		 * 
+		 */
+		
+		
+		String rulestore = req.getParameter("rulestore");
+		
+		// SQL
+		if( rulestore != null ){
+		
+			
+			// set current rule store
+			Integer ite = 0;
+			ite = Integer.parseInt(rulestore);
+			
+			
+			RuleStoreHelper.setCurrentRuleStore(ite);
+			//RuleStoreHelper.getCurrentRuleStore();
+			
+			
+			
+		}
+		
+		
+		
 		String database = req.getParameter("sql");
 		
 		
@@ -614,7 +667,7 @@ public class RefmoServlet extends HttpServlet {
 			// SQL
 			if(nosql_true != null ){
 				if(nosql_true.equals("true")){
-					rsmgd = new NoSqlRuleStore();
+					rsmgd = new NoSqlRuleStoreSimple();
 					RefmoLogr sqlDeleteAll = new RefmoLogr("Delete All NoSQL");
 					sqlDeleteAll.start();
 					((NoSqlRuleStore)rsmgd).deleteAll();
@@ -641,6 +694,22 @@ public class RefmoServlet extends HttpServlet {
 			}
 			
 			 
+			
+			
+			
+			String createtestdata = req.getParameter("createtestdata");
+		
+		
+		// SQL
+		if( createtestdata != null ){
+
+
+				int anz_testdata = Integer.parseInt( createtestdata);
+				//anz_testdata = 1000;
+				testCreateTestData(anz_testdata);
+					
+				
+		}
 			 
 			
 			 
@@ -857,7 +926,110 @@ public class RefmoServlet extends HttpServlet {
 //		
 //	}
 	
+	private void testFindRuleKeys(final int parseInt) {
+		Thread thread = ThreadManager.createBackgroundThread(new Runnable() {
+			
+			Integer int_testdata = parseInt;
+			  public void run() {
+			    try {
+			    //  while (true) {
+			   //     counter.incrementAndGet();
+			   //     find rule keys
+			   	 RuleStore rs =  RuleStoreHelper.getCurrentRuleStore();
+			   	 
+			   //	 if()
+			   	 List<Long> durationsFind = new ArrayList();
+			   	 
+				 Rule nr =  new Rule(
+ 						null,
+ 						new Subject(new Condition("s3", Comparision.EQUAL,"value")),
+ 						new Action(new Condition("a3", Comparision.EQUAL,"value")),
+ 						new Resource(new Condition("r3", Comparision.EQUAL,"value")),
+ 						Decision.PERMIT);
+				 
+				 
+			   	 for (int i = 0; i < int_testdata; i++) { 
+			    		
+			   		durationsFind.add(rs.findKey(null, nr.getSubject(), nr.getAction(), nr.getResource()));
+				  }
+	 
+
+						
+					} 
+			    	  
+			      //  Thread.sleep(10);
+			      
+			    catch (Exception ex) {
+			      throw new RuntimeException("Interrupted in loop:", ex);
+			    }
+			  }
+			  
+
+			});
+		
+			thread.start();
+			
+			
+		}	
 	
+	
+	
+	
+	
+private void testCreateTestData(final int parseInt) {
+	Thread thread = ThreadManager.createBackgroundThread(new Runnable() {
+		
+		Integer int_testdata = parseInt;
+		  public void run() {
+		    try {
+		    //  while (true) {
+		   //     counter.incrementAndGet();
+		   //     create custom rules for 
+		    	  
+		    	 RuleStore rs =  RuleStoreHelper.getCurrentRuleStore();
+		    	 
+		    	 for (int i = 0; i < parseInt; i++) {
+		    		 
+		    		 
+		    		 Rule nr = null;
+		    		 if( i == 0 ){
+		    			  
+		    			 nr =  new Rule(
+		    						null,
+		    						new Subject(new Condition("s3", Comparision.EQUAL,"value")),
+		    						new Action(new Condition("a3", Comparision.EQUAL,"value")),
+		    						new Resource(new Condition("r3", Comparision.EQUAL,"value")),
+		    						Decision.PERMIT);
+		    		 }
+		    		 
+		    		 else{
+		    			 
+		    			TestDataGenerator tdg = new TestDataGenerator();
+		    		    nr =	 tdg.randomMaintainRequest().getRule();
+		    		    
+		    		 }
+		    		 
+		    	
+		    		rs.create(null, nr.getSubject(), nr.getAction(), nr.getResource(), Decision.PERMIT);
+					
+				} 
+		    	  
+		      //  Thread.sleep(10);
+		      
+		    } catch (Exception ex) {
+		      throw new RuntimeException("Interrupted in loop:", ex);
+		    }
+		  }
+		  
+
+		});
+	
+		thread.start();
+		
+		
+	}
+
+
 public static void getCountRules() {
 	RuleStore rsmgd = null;
 	
@@ -985,7 +1157,7 @@ private static void  testfindRules(){
 //				null,
 //				null,
 //				Decision.PERMIT));
-		
+//		
 		
 		rules.add(new Rule(
 				new Condition("rp1", Comparision.EQUAL, "value"),
@@ -1014,7 +1186,7 @@ private static void  testfindRules(){
 //				new Action(new Condition("a2", Comparision.EQUAL,"value")),
 //				new Resource(new Condition("r2", Comparision.EQUAL,"value")),
 //				Decision.PERMIT));
-//		
+		
 		
 
 		

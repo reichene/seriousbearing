@@ -16,6 +16,7 @@ import de.abacs.base.entity.Rule;
 import de.abacs.base.entity.Subject;
 import de.abacs.base.store.RuleStore;
 import edu.hfu.refmo.logger.RefmoLogr;
+import edu.hfu.refmo.store.nosql.simple.SimpleNoSQLManager;
 
 public class NoSqlRuleStore implements RuleStore {
 
@@ -269,5 +270,20 @@ public class NoSqlRuleStore implements RuleStore {
 		return new DatastoreManager().count();
 	
 		
+	}
+
+	@Override
+	public Long findKey(AttributeTreeElement arg0, Subject arg1, Action arg2,
+			Resource arg3) {
+		RefmoLogr reflog = new RefmoLogr("time to get  rule keys");
+		reflog.start();
+		
+
+		new DatastoreManager().findRuleKeys(null, arg1, arg2,  arg3);
+	
+	
+
+		return reflog.stop();
+	
 	}
 }

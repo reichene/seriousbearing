@@ -58,6 +58,8 @@
       <class>edu.hfu.refmo.store.sql.model.advanced.DBTerm</class> 
       <class>edu.hfu.refmo.store.sql.model.advanced.DBTerm_Condition</class> 
       <class>edu.hfu.refmo.store.sql.model.advanced.DBTerm_Conjunction</class> 
+      <class>edu.hfu.refmo.store.sql.simple.SimpleAttributeCombination</class> 
+      <class>edu.hfu.refmo.store.sql.simple.SimpleRule</class> 
     <exclude-unlisted-classes/>
 
     <properties>
@@ -70,9 +72,11 @@
            	
            	<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
            	<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/rulestore_advanced"/>
-
     		<property name="javax.persistence.jdbc.user" value="root"/>
     		<property name="javax.persistence.jdbc.password" value="admin"/>
+    		
+    		
+    		
             <property name="datanucleus.autoCreateSchema" value="false"/>
             <property name="datanucleus.validateTables" value="false"/>
             <property name="datanucleus.validateConstraints" value="false"/>
@@ -82,6 +86,47 @@
         
 
     </properties>
-
   </persistence-unit>
+  
+     <persistence-unit name="JPAReferenceMonitorAdvaProduct">
+      <class>edu.hfu.refmo.store.sql.model.advanced.DBRule</class>
+      <class>edu.hfu.refmo.store.sql.model.advanced.DBAction</class>
+      <class>edu.hfu.refmo.store.sql.model.advanced.DBRulePriority</class>
+      <class>edu.hfu.refmo.store.sql.model.advanced.DBCategory</class>     
+      <class>edu.hfu.refmo.store.sql.model.advanced.DBResource</class>     
+      <class>edu.hfu.refmo.store.sql.model.advanced.DBSubject</class>            
+      <class>edu.hfu.refmo.store.sql.model.advanced.DBTerm</class> 
+      <class>edu.hfu.refmo.store.sql.model.advanced.DBTerm_Condition</class> 
+      <class>edu.hfu.refmo.store.sql.model.advanced.DBTerm_Conjunction</class> 
+      <class>edu.hfu.refmo.store.sql.simple.SimpleAttributeCombination</class> 
+      <class>edu.hfu.refmo.store.sql.simple.SimpleRule</class> 
+    <exclude-unlisted-classes/>
+
+    <properties>
+        
+           	<!-- 
+           	   	properties.put("javax.persistence.jdbc.driver","com.mysql.jdbc.Driver");
+	        	properties.put("javax.persistence.jdbc.user", System.getProperty("cloudsql.user.dev"));
+	        	properties.put("javax.persistence.jdbc.password", System.getProperty("cloudsql.password.dev"));
+	        	properties.put("javax.persistence.jdbc.url", System.getProperty("cloudsql.url.dev")+System.getProperty("cloudsql.database.dev")); -->
+           	
+           	<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.GoogleDriver"/>
+           	<property name="javax.persistence.jdbc.url" value="jdbc:google:mysql://serious-bearing-580:airport420/rulestore"/>
+    		<property name="javax.persistence.jdbc.user" value="root"/>
+    		<!--  <property name="javax.persistence.jdbc.password" value="ApfelSchorle1"/>-->
+    		
+    		
+    		
+            <property name="datanucleus.autoCreateSchema" value="true"/>
+            <property name="datanucleus.validateTables" value="true"/>
+            <property name="datanucleus.validateConstraints" value="true"/>
+            <property name="datanucleus.storeManagerType" value="rdbms"/>
+            
+
+        
+
+    </properties>
+  </persistence-unit> 
+   
+   
 </persistence>

@@ -5,7 +5,7 @@
   <sessions-enabled>true</sessions-enabled>
    <use-google-connector-j>true</use-google-connector-j>
   <threadsafe>true</threadsafe>
-  <version>7</version>
+  <version>10</version>
 
   <!--
     Allows App Engine to send multiple requests to one instance in parallel:
